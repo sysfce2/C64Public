@@ -61,6 +61,7 @@ mainLoop
 	; Ensure this is set
 	+MByteValueToAddress_A 5 , GamePaletteBank
 
+	jsr Bus20To32Bit1_Init
 	jsr Bus24Bit_Init
 	jsr Bus20To32Bit1_Init
 	jsr Audio_Init

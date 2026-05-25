@@ -1,0 +1,49 @@
+!source "main14Options.a"
+
+!to "bin/mainapu.prg", cbm
+!sal
+!sl "tmp/mainapu.map"
+!svl "tmp/mainapu.lbl"
+!pdb "tmp/mainapu.pdb"
+!cpu 6510
+!ct pet
+
+
+!source "stdlib/stdlib.a"
+!source "stdlib/Comparisons.a"
+!source "BombJack/stdlib/Bus24Bit_Macros.a"
+!source "BombJack/stdlib/Bus20To32Bit1_Macros.a"
+!source "BombJack/stdlib/Video_Macros.a"
+!source "BombJack/stdlib/APU_Macros.a"
+!source "AfterBurner/LandscapeDefs.a"
+!source "AfterBurner/CommonBootDefinesPre.a"
+!source "tmp\CommonBootDefines.a"
+
+!zn
+; Somewhere within the free memory of the main init/loader stage
+*=$4000
+GameAPUInit
+	jsr Bus20To32Bit1_Init
+	jsr Bus24Bit_Init
+	jsr Bus20To32Bit1_Init
+	jsr APU_ResetDisableClear
+	jsr SetupAPU
+	rts
+
+!source "BombJack/stdlib/Video.a"
+!source "stdlib/LongBranches.a"
+
+!source "AfterBurner/Landscape.a"
+; These are stubbed out, not used, for APU hardware init
+ObjectDrawLo
+ObjectDrawHi
+playerYPositionOffsetForLandscape
+LandscapeMapRowsData
+UpdateLandscapeFrameInternal
+
+!source "BombJack/stdlib/APU.a"
+!source "AfterBurner/APU.a"
+!source "AfterBurner/APUHardware.a"
+!source "BombJack/stdlib/APUSetup.a"
+
++MCheckNotInIOKernal

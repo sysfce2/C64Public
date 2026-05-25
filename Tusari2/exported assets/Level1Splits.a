@@ -9,7 +9,7 @@ VerticalColours
 	!word 550
 	!by VIC2Colour_Blue , VIC2Colour_Yellow , VIC2Colour_LightGrey
 	!word 750
-	!by VIC2Multicolour_Yellow , VIC2Multicolour_Red , VIC2Colour_LightGrey
+	!by VIC2Colour_Yellow , VIC2Colour_Red , VIC2Colour_LightGrey
 
 	; Left/Right map pixel positions
 	!word 200 , 400
@@ -21,7 +21,7 @@ VerticalColours
 	!word 550
 	!by VIC2Colour_Blue , VIC2Colour_Yellow , VIC2Colour_LightGrey
 	!word 750
-	!by VIC2Multicolour_Yellow , VIC2Multicolour_Red , VIC2Colour_LightGrey
+	!by VIC2Colour_Yellow , VIC2Colour_Red , VIC2Colour_LightGrey
 
 	; Left/Right map pixel positions
 	!word 400 , 600
@@ -33,14 +33,26 @@ VerticalColours
 	!word 550
 	!by VIC2Colour_Blue , VIC2Colour_Yellow , VIC2Colour_LightGrey
 	!word 750
-	!by VIC2Multicolour_Yellow , VIC2Multicolour_Red , VIC2Colour_LightGrey
+	!by VIC2Colour_Yellow , VIC2Colour_Red , VIC2Colour_LightGrey
 
-	!word 1200 , 2048
-	!word 100
-	!by VIC2Colour_Cyan , VIC2Colour_Grey , VIC2Colour_LightGreen
-	!word 300
-	!by VIC2Colour_Purple , VIC2Multicolour_Red , VIC2Colour_Grey
-	!word 500
-	!by VIC2Colour_Green , VIC2Colour_Blue , VIC2Colour_Grey
-	!word 700
-	!by VIC2Colour_Brown , VIC2Multicolour_Yellow , VIC2Colour_Cyan
+	; Descending the caves
+	!word 2708 , 3396
+	!word 221
+	!by VIC2Colour_DarkGrey , VIC2Colour_Orange , VIC2Colour_Yellow
+	!word 439
+	!by VIC2Colour_Purple , VIC2Colour_Red , VIC2Colour_LightRed
+	!word 630
+	!by VIC2Colour_Red , VIC2Colour_LightRed , VIC2Colour_Yellow
+	!word 878
+	!by VIC2Colour_Grey , VIC2Colour_DarkGrey , VIC2Colour_LightGrey
+
+	; Ascending the caves
+	!word 3396 , 4000
+	!word 379
+	!by VIC2Colour_Red , VIC2Colour_LightRed , VIC2Colour_Yellow
+	!word 653
+	!by VIC2Colour_DarkGrey , VIC2Colour_Orange , VIC2Colour_Yellow
+	!word 853
+	!by VIC2Colour_Purple , VIC2Colour_Red , VIC2Colour_LightRed
+	!word 1053
+	!by VIC2Colour_Grey , VIC2Colour_DarkGrey , VIC2Colour_LightGrey

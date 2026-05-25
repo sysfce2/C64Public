@@ -21,6 +21,7 @@
 !source "tmp\Demo14AddFile_Title.a"
 !source "tmp\Demo14AddFile_Game.a"
 !source "tmp\Demo14AddFile_MissionComplete.a"
+!source "tmp\CommonAPUDefines.a"
 
 !source "AfterBurner/LandscapeDefs.a"
 !source "AfterBurner/SpriteMacros.a"
@@ -44,22 +45,40 @@ Initialise_NoMACROWaitForTheLastScan = 1
 !source "stdlib/Initialise.a"
 
 * = SCREENRAM
-messageMW
-!scr "MegaWang 2000 Turbo Edition             After Burner : Checking for external RAM..."
-messageMWEnd
-messageMWGameData
-!scr "Game data..."
-messageMWGameDataEnd
+messageMWBoot
+!scr "MegaWang 2000 Turbo Edition"
+messageMWBootEnd
+* = SCREENRAM + (VIC2ScreenCharsWidth * 1)
 messageMWRAMOK
 !scr "RAM OK "
 debugDMA
-!scr "----------------              "
+!scr "----------------"
 messageMWRAMOKEnd
+
+* = SCREENRAM + (VIC2ScreenCharsWidth * 2)
 messageMWRAMError
 !scr "RAM BLOCK ERROR: "
 messageMWRAMErrorBlock
 !scr "------"
 messageMWRAMErrorEnd
+
+* = SCREENRAM + (VIC2ScreenCharsWidth * 3)
+messageMWCartToRAM
+!scr "Cart transfer: "
+messageMWCartToRAMBlock
+!scr "----------"
+messageMWCartToRAMEnd
+
+* = SCREENRAM + (VIC2ScreenCharsWidth * 4)
+messageMW
+!scr "After Burner : Checking for external RAM..."
+messageMWEnd
+* = SCREENRAM + (VIC2ScreenCharsWidth * 6)
+messageMWGameData
+!scr "Game data..."
+messageMWGameDataEnd
+
+* = $800
 
 !source "BombJack/stdlib/Audio.a"
 !source "BombJack/stdlib/Video.a"
@@ -86,8 +105,14 @@ GameExpectedIdentifierLen = * - GameExpectedIdentifier
 mainLoop
 	lda #ProcessorPortAllRAMWithIO
 	jsr InitialiseMachine
-	jsr ExternalMemory_C64DisplayStartupMessage
+	; This allows spacebar to be read in the game code
+	+MInitKeyboardCheckForRunStop .skip
+.skip
+	+ClearScreenAt_AX COLOURRAM , VIC2Colour_Black
+	+SetMemory_AX COLOURRAM + (messageMWBoot & VIC2MemorySetup_ScreenSizeMask) , COLOURRAM + (messageMWBootEnd & VIC2MemorySetup_ScreenSizeMask) - 1 , VIC2Colour_White
+	+SetDefaultScreenLowerCase_A
 
+	jsr Bus20To32Bit1_Init
 	jsr Bus24Bit_Init
 	jsr Bus20To32Bit1_Init
 	jsr APU_ResetDisableClear
@@ -95,6 +120,10 @@ mainLoop
 	jsr APU_ResetDisableClear
 
 	jsr Audio_Init
+
+	+LTestForPortNotBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Down , SkipCartToRAM
+;	jmp SkipCartToRAM ; Debug
+
 !ifdef SendResourceData {
 	jsr HardwareTest_VideoPattern0
 
@@ -203,9 +232,16 @@ mainLoop
 	+MByteValueToAddress_A (<(resourceFileSize_FileR6 / kSize_8K))+1 , $fd
 	+MLongValueToAddress_A 873536+1326593 , $02
 	jsr SendMusicData
+
+	; After sending audio data with some old non-exact video layers the display needs to be reinitialised to something sane
+	jsr Video_DisableDisplay
+	jsr APU_ResetDisableClear
+	jsr HardwareTest_VideoPattern0
 }
 
 CheckForHWData
+	jsr ExternalMemory_C64DisplayStartupMessage
+
 ;+MBPH
 !ifdef resourceFileOffset_File1 {
 	+MByteValueToAddress_A <(resourceFileOffset_File1 / kSize_8K) , $fb
@@ -243,6 +279,7 @@ CheckForHWData
 
 ;	+WaitForFire_A
 }
+
 	; Complete all chunks
 	jsr Bus20To32Bit1_ShortReset
 
@@ -256,7 +293,6 @@ CheckForHWData
 	dex
 	bpl .cl1
 
-CheckForGameData
 ;	+WaitForFire_A
 !ifdef resourceFileOffset_File2 {
 	+MByteValueToAddress_A <(resourceFileOffset_File2 / kSize_8K) , $fb
@@ -265,6 +301,8 @@ CheckForGameData
 	jsr TransferFromCartridgeToExternalRAM
 }
 
+CheckForGameData
+
 	lda #ForGame_checksumsCount
 	ldx #<ForGame_checksumsNumBytes
 	jsr ExternalMemory_C64CheckMemorySetChecksumParams
@@ -272,6 +310,18 @@ CheckForGameData
 	jsr ExternalMemory_C64CheckMemorySetChecksumAddress
 	+MLongValueTo_AXY gameDataIdentifier
 	jsr ExternalMemory_C64CheckMemory
+	jmp .skipInit
+
+SkipCartToRAM
+	; Complete all chunks
+	jsr Bus20To32Bit1_ShortReset
+
+	lda #kVideo_EnableDisplay_Enable
+	jsr Video_EnableDisplay
+
+.skipInit
+	; Complete all chunks
+	jsr Bus20To32Bit1_ShortReset
 
 	; Disable the C64 screen for speed
 	lda #0
@@ -281,6 +331,7 @@ CheckForGameData
 	; The title screen checks GameScore_Value for hiscore entry...
 	+M_RAMTAS_LOW_STACK
 
+.afterRAMTAS
 !ifdef Debug_FakeHiscore {
 	+MByteValueToAddress_A 9 , GameScore_Value+1
 	+MByteValueToAddress_A 9 , GameScore_Value+2
@@ -290,35 +341,83 @@ CheckForGameData
 	+MByteValueToAddress_A 9-.i , GameTotalHits + .i-1
 }
 }
-	+LTestForPortNotBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Fire , DisplayTestMenu
+
+	jsr GameAPUInit
+
+	+LTestForPortNotBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Right , DisplayTestMenu
+;	jmp DisplayTestMenu ; Debug
 
 	jmp LoadRunTitleScreen
 
 !zn
-TransferFromCartridgeToExternalRAM
-	+MGuardAgainstLowerCart *
-	+MGuardAgainstUpperCart *
+.externalAddress !24 0
+.lastBankPos = $f0
+.lastBankLen = $10
+.externalAddressWork !24 .lastBankPos
+
+.setExternalAddress
+	; Can now call Bus20To32Bit1_* routines again
+	+MByteValueToAddress_A ProcessorPortAllRAMWithIO , ZPProcessorPort
+
 	jsr Bus20To32Bit1_Init
 	jsr Bus20To32Bit1_SetLatch0
-	+MBus24Bit_Send8BitValue 0
+	+MBus24Bit_Send8BitValueFromAddress .externalAddress+0
 	jsr Bus20To32Bit1_SetLatch1
-	+MBus24Bit_Send8BitValue 0
+	+MBus24Bit_Send8BitValueFromAddress .externalAddress+1
 	jsr Bus20To32Bit1_SetLatch2
-	+MBus24Bit_Send8BitValue 0
-	jsr Bus20To32Bit1_SetLatch6
+	+MBus24Bit_Send8BitValueFromAddress .externalAddress+2
+	rts
 
-	; This must not call any Bus20To32Bit1_* routines since they all live under the kernal
+.setExternalAddressWork
+	; Can now call Bus20To32Bit1_* routines again
+	+MByteValueToAddress_A ProcessorPortAllRAMWithIO , ZPProcessorPort
+
+	jsr Bus20To32Bit1_Init
+	jsr Bus20To32Bit1_SetLatch0
+	+MBus24Bit_Send8BitValueFromAddress .externalAddressWork+0
+	jsr Bus20To32Bit1_SetLatch1
+	+MBus24Bit_Send8BitValueFromAddress .externalAddressWork+1
+	jsr Bus20To32Bit1_SetLatch2
+	+MBus24Bit_Send8BitValueFromAddress .externalAddressWork+2
+	rts
+
+.doRetry2
+	inc VIC2ScreenColour
+.doRetry
+	inc VIC2BorderColour
+	jmp .clre1
+
+TransferFromCartridgeToExternalRAM
+	+SetMemory_AX COLOURRAM + (messageMWCartToRAM & VIC2MemorySetup_ScreenSizeMask) , COLOURRAM + (messageMWCartToRAMEnd & VIC2MemorySetup_ScreenSizeMask) - 1 , VIC2Colour_White
+
+	+MGuardAgainstLowerCart *
+	+MGuardAgainstUpperCart *
+
+	+MByteValueToAddress_A 0 , .externalAddress+0
+	+MAlsoToAddress_A .externalAddress+1
+	+MAlsoToAddress_A .externalAddress+2
+
+	; Disable any VBLANK NMI
 	+MByteValueToAddress_A $7f , CIA2InterruptControl
-	+MByteValueToAddress_A ProcessorPortDefault , ZPProcessorPort
+
 .clre1
-	inc SCREENRAM
-	ldy #>kSize_8K
+	jsr .setExternalAddress
+	jsr Bus20To32Bit1_SetLatch6
+	
+	; This must not call any Bus20To32Bit1_* routines since they all live under the kernal
+	+MByteValueToAddress_A ProcessorPortDefault , ZPProcessorPort
+
 	+MByteValueToAddress_A >C64Cartridge_Lo_8K , .clre2+2
 	lda $fb
 	sta $de00
+	ldx #<messageMWCartToRAMBlock
+	jsr DisplayHexFromAAtX
 	lda $fc
 	and #%00111111
 	sta $df00
+	ldx #<messageMWCartToRAMBlock+2
+	jsr DisplayHexFromAAtX
+	ldy #>kSize_8K
 	ldx #0
 .clre2
 	lda C64Cartridge_Lo_8K,x
@@ -328,13 +427,52 @@ TransferFromCartridgeToExternalRAM
 	inc .clre2+2
 	dey
 	bne .clre2
+
+	; Verify start of the cart bank
+	jsr .setExternalAddress
+	jsr Bus20To32Bit1_ReadMode
+	jsr Bus20To32Bit1_SetLatch5
+
+	; This must not call any Bus20To32Bit1_* routines since they all live under the kernal
+	+MByteValueToAddress_A ProcessorPortDefault , ZPProcessorPort
+
+	ldx #0
+.cpl1
+	+MBus24Bit_Get8BitValueToA
+	cmp C64Cartridge_Lo_8K , x
+	bne .doRetry
+	inx
+	cpx #.lastBankLen
+	bne .cpl1
+
+	; Verify last page of the cart bank
+	+MAddU8From16ToAddr16 (>kSize_8K)-1 , .externalAddress+1 , .externalAddress+2 , .externalAddressWork+1 , .externalAddressWork+2
+	jsr .setExternalAddressWork
+	jsr Bus20To32Bit1_ReadMode
+	jsr Bus20To32Bit1_SetLatch5
+
+	; This must not call any Bus20To32Bit1_* routines since they all live under the kernal
+	+MByteValueToAddress_A ProcessorPortDefault , ZPProcessorPort
+
+	ldx #0
+.cpl2
+	+MBus24Bit_Get8BitValueToA
+	cmp C64Cartridge_Lo_8K + kSize_8K - $100 + .lastBankPos, x
+	+lbne .doRetry2
+	inx
+	cpx #.lastBankLen
+	bne .cpl2
+
+	+MAddU8ToAddr16 >kSize_8K , .externalAddress+1 , .externalAddress+2
+
 	; End of the 8KB, so move to the next bank
 	inc $fb
 	bne .clre3
 	inc $fc
 .clre3
 	dec $fd
-	bne .clre1	
+	+lbne .clre1	
+
 	+MByteValueToAddress_A ProcessorPortAllRAMWithIO , ZPProcessorPort
 	+MByteValueToAddress_A %10010000 , CIA2InterruptControl
 
@@ -347,6 +485,8 @@ TransferFromCartridgeToExternalRAM
 
 !zn
 SendMusicData
+	+SetMemory_AX COLOURRAM + (messageMWCartToRAM & VIC2MemorySetup_ScreenSizeMask) , COLOURRAM + (messageMWCartToRAMEnd & VIC2MemorySetup_ScreenSizeMask) - 1 , VIC2Colour_White
+
 	+MGuardAgainstLowerCart *
 	+MGuardAgainstUpperCart *
 	jsr Bus24Bit_Init
@@ -358,8 +498,14 @@ SendMusicData
 	jsr Bus24Bit_Reset
 	+MBus24Bit_Send8BitValue kBus24Bit_VideoLayer_EBBS
 	+MBus24Bit_Send8BitValueFromAddress $05
+	ldx #<messageMWCartToRAMBlock
+	jsr DisplayHexFromAAtX
 	+MBus24Bit_Send8BitValueFromAddress $06
+	ldx #<messageMWCartToRAMBlock+2
+	jsr DisplayHexFromAAtX
 	+MBus24Bit_Send8BitValueFromAddress $08	; New Bank register
+	ldx #<messageMWCartToRAMBlock+4
+	jsr DisplayHexFromAAtX
 
 	jsr Bus24Bit_Reset
 	+MBus24Bit_Send8BitValueFromAddress $07
@@ -371,9 +517,13 @@ SendMusicData
 
 	lda $fb
 	sta $de00
+	ldx #<messageMWCartToRAMBlock+6
+	jsr DisplayHexFromAAtX
 	lda $fc
 	and #%00111111
 	sta $df00
+	ldx #<messageMWCartToRAMBlock+8
+	jsr DisplayHexFromAAtX
 
 .sssm1	lda C64Cartridge_Lo_8K
 	+MBus24Bit_Send8BitValueFromA
@@ -394,9 +544,13 @@ SendMusicData
 	+MIncAddr16 $fb , $fc
 	lda $fb
 	sta $de00
+	ldx #<messageMWCartToRAMBlock+6
+	jsr DisplayHexFromAAtX
 	lda $fc
 	and #%00111111
 	sta $df00
+	ldx #<messageMWCartToRAMBlock+8
+	jsr DisplayHexFromAAtX
 
 .ss3
 	inc $02
@@ -407,7 +561,6 @@ SendMusicData
 	lda $04
 	cmp $08
 	beq .ss4
-	inc SCREENRAM+1
 	+MByteValueToAddress_A ProcessorPortAllRAMWithIO , ZPProcessorPort
 	jmp .ss1
 .ss4
@@ -445,7 +598,8 @@ DisplayHexFromAAtX
 	inx
 	rts
 
-
+*=GameAPUInit
+!bin "bin/mainapu.prg",,2
 
 +MCheckNotInIOKernal
 

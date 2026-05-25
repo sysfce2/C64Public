@@ -12,6 +12,7 @@ Parsing source file '../Scroller/ScrollEntryAfter.a'
 Parsing source file '../Scroller/ScrollEntryCommon.a'
 Parsing source file '../Scroller/ScrollEntryCommonVars.a'
 Parsing source file '../Scroller/ScrollerMacros.a'
+Parsing source file '../stdlib/LongBranches.a'
 Parsing source file 'bin/FingerPrint.a'
 Segment size is 2048 ($800) bytes ($c800 - $d000 exclusive).
 Parsing source file '../stdlib/Initialise.a'
@@ -43,7 +44,6 @@ Parsing source file '../Citadel2/asm/Score_Macros.a'
 Parsing source file 'bin/LevelTempOptions.a'
 Parsing source file 'asm/CommonGameData.a'
 Parsing source file 'asm/Animation_macros.a'
-Parsing source file '../stdlib/LongBranches.a'
 Parsing source file 'asm/Animation.a'
 Parsing source file '../Scroller/SpritePosToScreenPosMem.a'
 Parsing source file '../Scroller/SpritePosToScreenPosMem2.a'
@@ -442,6 +442,7 @@ Parsing source file '../Scroller/ScrollEntryAfter.a'
 Parsing source file '../Scroller/ScrollEntryCommon.a'
 Parsing source file '../Scroller/ScrollEntryCommonVars.a'
 Parsing source file '../Scroller/ScrollerMacros.a'
+Parsing source file '../stdlib/LongBranches.a'
 Parsing source file 'bin/FingerPrint.a'
 Parsing source file '../stdlib/Initialise.a'
 Parsing source file '../Scroller/OneTime.a'
@@ -468,7 +469,6 @@ Parsing source file '../Citadel2/asm/Score_Macros.a'
 Parsing source file 'bin/LevelTempOptions.a'
 Parsing source file 'asm/CommonGameData.a'
 Parsing source file 'asm/Animation_macros.a'
-Parsing source file '../stdlib/LongBranches.a'
 Parsing source file 'asm/Animation.a'
 Parsing source file '../Scroller/SpritePosToScreenPosMem.a'
 Parsing source file '../Scroller/SpritePosToScreenPosMem2.a'
@@ -517,6 +517,7 @@ Parsing source file '../Scroller/ScrollEntryAfter.a'
 Parsing source file '../Scroller/ScrollEntryCommon.a'
 Parsing source file '../Scroller/ScrollEntryCommonVars.a'
 Parsing source file '../Scroller/ScrollerMacros.a'
+Parsing source file '../stdlib/LongBranches.a'
 Parsing source file 'bin/FingerPrint.a'
 Parsing source file '../stdlib/Initialise.a'
 Parsing source file '../Scroller/OneTime.a'
@@ -543,7 +544,6 @@ Parsing source file '../Citadel2/asm/Score_Macros.a'
 Parsing source file 'bin/LevelTempOptions.a'
 Parsing source file 'asm/CommonGameData.a'
 Parsing source file 'asm/Animation_macros.a'
-Parsing source file '../stdlib/LongBranches.a'
 Parsing source file 'asm/Animation.a'
 Parsing source file '../Scroller/SpritePosToScreenPosMem.a'
 Parsing source file '../Scroller/SpritePosToScreenPosMem2.a'
@@ -645,7 +645,7 @@ File 'bin\Scroller1.cmp' offset $0 xor $0 len $2000
 File 'bin\Scroller1.cmp' offset $2000 xor $0 len $2000
 File 'bin\Scroller1.cmp' offset $4000 xor $0 len $2000
 File 'bin\Scroller1.cmp' offset $6000 xor $0 len $2000
-File 'bin\Scroller1.cmp' offset $8000 xor $0 len $104e
+File 'bin\Scroller1.cmp' offset $8000 xor $0 len $1469
 File 'bin\Scroller2.cmp' offset $0 xor $0 len $2000
 File 'bin\Scroller2.cmp' offset $2000 xor $0 len $2000
 File 'bin\Scroller2.cmp' offset $4000 xor $0 len $2000
@@ -730,19 +730,19 @@ New bank $1d
 File 'bin\BlockStrips.bin' read $c35 to use $c35
 New bank $1e
  Write multi-bank 30 $8000
-File 'bin\Scroller1.cmp' read $904e to use $904e
+File 'bin\Scroller1.cmp' read $9469 to use $9469
 New bank $1f
  Write multi-bank 31 $8000
-File 'bin\Scroller1.cmp' read $904e to use $704e
+File 'bin\Scroller1.cmp' read $9469 to use $7469
 New bank $20
  Write multi-bank 32 $8000
-File 'bin\Scroller1.cmp' read $904e to use $504e
+File 'bin\Scroller1.cmp' read $9469 to use $5469
 New bank $21
  Write multi-bank 33 $8000
-File 'bin\Scroller1.cmp' read $904e to use $304e
+File 'bin\Scroller1.cmp' read $9469 to use $3469
 New bank $22
  Write multi-bank 34 $8000
-File 'bin\Scroller1.cmp' read $904e to use $104e
+File 'bin\Scroller1.cmp' read $9469 to use $1469
 New bank $23
  Write multi-bank 35 $8000
 File 'bin\Scroller2.cmp' read $7f6a to use $7f6a
@@ -840,7 +840,7 @@ File 'bin\Scroller1.cmp' offset $0 xor $0 len $2000
 File 'bin\Scroller1.cmp' offset $2000 xor $0 len $2000
 File 'bin\Scroller1.cmp' offset $4000 xor $0 len $2000
 File 'bin\Scroller1.cmp' offset $6000 xor $0 len $2000
-File 'bin\Scroller1.cmp' offset $8000 xor $0 len $104e
+File 'bin\Scroller1.cmp' offset $8000 xor $0 len $1469
 File 'bin\Scroller2.cmp' offset $0 xor $0 len $2000
 File 'bin\Scroller2.cmp' offset $2000 xor $0 len $2000
 File 'bin\Scroller2.cmp' offset $4000 xor $0 len $2000
@@ -925,19 +925,19 @@ New bank $1d
 File 'bin\BlockStrips.bin' read $c35 to use $c35
 New bank $1e
  Write multi-bank 30 $8000
-File 'bin\Scroller1.cmp' read $904e to use $904e
+File 'bin\Scroller1.cmp' read $9469 to use $9469
 New bank $1f
  Write multi-bank 31 $8000
-File 'bin\Scroller1.cmp' read $904e to use $704e
+File 'bin\Scroller1.cmp' read $9469 to use $7469
 New bank $20
  Write multi-bank 32 $8000
-File 'bin\Scroller1.cmp' read $904e to use $504e
+File 'bin\Scroller1.cmp' read $9469 to use $5469
 New bank $21
  Write multi-bank 33 $8000
-File 'bin\Scroller1.cmp' read $904e to use $304e
+File 'bin\Scroller1.cmp' read $9469 to use $3469
 New bank $22
  Write multi-bank 34 $8000
-File 'bin\Scroller1.cmp' read $904e to use $104e
+File 'bin\Scroller1.cmp' read $9469 to use $1469
 New bank $23
  Write multi-bank 35 $8000
 File 'bin\Scroller2.cmp' read $7f6a to use $7f6a

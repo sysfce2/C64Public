@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="2020.04.10" orientation="orthogonal" renderorder="right-down" width="170" height="40" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="186">
+<map version="1.2" tiledversion="2020.04.10" orientation="orthogonal" renderorder="right-down" width="170" height="40" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="201">
  <tileset firstgid="1" source="Level1 - Map.tsx"/>
  <tileset firstgid="6801" source="Level1 sprites.tsx"/>
  <layer id="1" name="Tile Layer 1" width="170" height="40" locked="1">
@@ -87,14 +87,14 @@
   <object id="47" gid="6908" x="2976.67" y="923" width="24" height="21"/>
   <object id="48" gid="6908" x="3041.33" y="922.333" width="24" height="21"/>
   <object id="49" gid="6908" x="3104.67" y="921.667" width="24" height="21"/>
-  <object id="50" gid="7023" x="3657.33" y="667.667" width="24" height="21"/>
-  <object id="51" gid="7023" x="3673.33" y="631.667" width="24" height="21"/>
-  <object id="52" gid="7023" x="3712.67" y="593" width="24" height="21"/>
-  <object id="53" gid="7023" x="3778.67" y="593" width="24" height="21"/>
-  <object id="54" gid="7023" x="3806" y="641" width="24" height="21"/>
-  <object id="55" gid="7023" x="3826" y="718.333" width="24" height="21"/>
-  <object id="56" gid="6893" x="3716" y="757" width="24" height="21"/>
-  <object id="57" gid="6865" x="3888.67" y="725.667" width="24" height="21"/>
+  <object id="50" gid="7023" x="3640" y="814.334" width="24" height="21"/>
+  <object id="51" gid="7023" x="3656" y="778.334" width="24" height="21"/>
+  <object id="52" gid="7023" x="3695.34" y="739.667" width="24" height="21"/>
+  <object id="53" gid="7023" x="3761.34" y="739.667" width="24" height="21"/>
+  <object id="54" gid="7023" x="3788.67" y="787.667" width="24" height="21"/>
+  <object id="55" gid="7023" x="3826" y="783.666" width="24" height="21"/>
+  <object id="56" gid="6893" x="3716" y="822.333" width="24" height="21"/>
+  <object id="57" gid="6865" x="3888.67" y="791" width="24" height="21"/>
   <object id="58" gid="6865" x="4327.33" y="757" width="24" height="21"/>
   <object id="59" gid="6865" x="4508" y="660.333" width="24" height="21"/>
   <object id="60" gid="6866" x="4610.75" y="772" width="24" height="21"/>
@@ -219,5 +219,20 @@
   <object id="183" gid="7023" x="159" y="199" width="24" height="21"/>
   <object id="184" gid="7023" x="191.5" y="200" width="24" height="21"/>
   <object id="185" gid="7023" x="226" y="200.5" width="24" height="21"/>
+  <object id="186" gid="7039" x="6.5" y="60" width="24" height="21"/>
+  <object id="187" gid="7039" x="7.5" y="86.75" width="24" height="21"/>
+  <object id="188" gid="7039" x="8.5" y="115" width="24" height="21"/>
+  <object id="189" gid="7041" x="54.75" y="40" width="24" height="21"/>
+  <object id="190" gid="7041" x="40.5" y="89.75" width="24" height="21"/>
+  <object id="191" gid="7041" x="42.25" y="117" width="24" height="21"/>
+  <object id="192" gid="7042" x="103" y="44.5" width="24" height="21"/>
+  <object id="193" gid="7042" x="83.25" y="89.5" width="24" height="21"/>
+  <object id="194" gid="7042" x="86.5" y="121.75" width="24" height="21"/>
+  <object id="195" gid="7043" x="160.75" y="47.75" width="24" height="21"/>
+  <object id="196" gid="7044" x="124.75" y="80" width="24" height="21"/>
+  <object id="197" gid="7045" x="186.25" y="86" width="24" height="21"/>
+  <object id="198" gid="7045" x="158.5" y="120.5" width="24" height="21"/>
+  <object id="199" gid="7046" x="213.75" y="54" width="24" height="21"/>
+  <object id="200" gid="7046" x="206.75" y="122.75" width="24" height="21"/>
  </objectgroup>
 </map>

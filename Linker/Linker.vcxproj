@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E4CC9563-3A20-49ED-83DA-0371BF52B4F8}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <NMakeBuildCommandLine>BuildIt.bat</NMakeBuildCommandLine>
+    <NMakeOutput>
+    </NMakeOutput>
+    <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="..\stdlib\BreakSerialBus.txt" />
+    <Text Include="Done.txt" />
+    <Text Include="readme.txt" />
+    <Text Include="TODO.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\stdlib\BASICEntry80d.a" />
+    <None Include="..\stdlib\BASICEntry810.a" />
+    <None Include="..\stdlib\BASICEntry900.a" />
+    <None Include="..\stdlib\BubbleSort.a" />
+    <None Include="..\stdlib\charpad.py" />
+    <None Include="..\stdlib\Comparisons.a" />
+    <None Include="..\stdlib\ExportLabels.a" />
+    <None Include="..\stdlib\FeatureEditor.bat" />
+    <None Include="..\stdlib\GnomeSort.a" />
+    <None Include="..\stdlib\Initialise.a" />
+    <None Include="..\stdlib\LongBranches.a" />
+    <None Include="..\stdlib\MemoryCopy.a" />
+    <None Include="..\stdlib\opcodeLengths.a" />
+    <None Include="..\stdlib\PETSCII.a" />
+    <None Include="..\stdlib\QuickSort.a" />
+    <None Include="..\stdlib\RunTests.bat" />
+    <None Include="..\stdlib\SampleInit.a" />
+    <None Include="..\stdlib\stdlib.a" />
+    <None Include="..\stdlib\TEDBASICEntry1001.a" />
+    <None Include="..\stdlib\test_charpad.py" />
+    <None Include="..\stdlib\VideoModes.a" />
+    <None Include="..\stdlib\VideoModes_Macros.a" />
+    <None Include="bin\Linker.lbl" />
+    <None Include="bin\Linker.map" />
+    <None Include="bin\Linker.pdb" />
+    <None Include="BuildIt.bat" />
+    <None Include="ChunkData.a" />
+    <None Include="ChunkMacros.a" />
+    <None Include="Chunks.a" />
+    <None Include="FeatureEditor.bat" />
+    <None Include="features\TestOutput.feature" />
+    <None Include="Linker.a" />
+    <None Include="_ChunkData.a" />
+    <None Include="_Chunks.a" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

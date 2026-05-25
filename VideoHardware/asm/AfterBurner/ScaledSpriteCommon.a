@@ -1,7 +1,7 @@
 ResetInterfaceAndStartSendingScaledSprites
 	; Reset the 24 bit interface
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch7_A
+	+MBus20To32Bit1_WriteMode_A
 	+MBus24Bit_Send8BitValue kBus20To32Bit1_latch7_ResetDone | kBus20To32Bit1_latch7_PassthroughDisable
 	+MBus24Bit_Send8BitValue kBus20To32Bit1_latch7_ResetDone | kBus20To32Bit1_latch7_PassthroughDisable | kBus20To32Bit1_latch7_InternalPA2
 	; Flag not ready
@@ -22,8 +22,8 @@ ResetInterfaceAndStartSendingScaledSprites
 
 ResetInterfaceAndStartSendingScaledSprites2
 	; Reset the 24 bit interface
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch7_A
+	+MBus20To32Bit1_WriteMode_A
 	+MBus24Bit_Send8BitValue kBus20To32Bit1_latch7_ResetDone | kBus20To32Bit1_latch7_PassthroughDisable
 	+MBus24Bit_Send8BitValue kBus20To32Bit1_latch7_ResetDone | kBus20To32Bit1_latch7_PassthroughDisable | kBus20To32Bit1_latch7_InternalPA2
 	; Flag not ready
@@ -87,14 +87,14 @@ RenderTimeout2
 }
 
 TerminateScaledSpritesAndSignalReady
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch4_A
+	+MBus20To32Bit1_WriteMode_A
 
 	jsr TerminateScaledSpritesList
 
 	; Reset the 24 bit interface
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch7_A
+	+MBus20To32Bit1_WriteMode_A
 	+MBus24Bit_Send8BitValue kBus20To32Bit1_latch7_ResetDone | kBus20To32Bit1_latch7_PassthroughDisable
 	+MBus24Bit_Send8BitValue kBus20To32Bit1_latch7_ResetDone | kBus20To32Bit1_latch7_PassthroughDisable | kBus20To32Bit1_latch7_InternalPA2
 	; Flag ready
@@ -105,14 +105,14 @@ TerminateScaledSpritesAndSignalReady
 	rts
 
 TerminateScaledSpritesAndSignalReady2
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch4_A
+	+MBus20To32Bit1_WriteMode_A
 
 	jsr TerminateScaledSpritesList
 
 	; Reset the 24 bit interface
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch7_A
+	+MBus20To32Bit1_WriteMode_A
 	+MBus24Bit_Send8BitValue kBus20To32Bit1_latch7_ResetDone | kBus20To32Bit1_latch7_PassthroughDisable
 	+MBus24Bit_Send8BitValue kBus20To32Bit1_latch7_ResetDone | kBus20To32Bit1_latch7_PassthroughDisable | kBus20To32Bit1_latch7_InternalPA2
 	; Flag ready

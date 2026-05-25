@@ -843,6 +843,21 @@
 	>> Assemble and test instructions in: C:\Work\BDD6502\features\C64WithNewUserPort20to32Bit1Minimal.a
 	>>> While the _PC transient is a problem, the low ATN transient is also a huge problem since it will reset the interface.
 		>> Added SP1, PS2, ATN filtering: "C:\work\BombJack\V2.0\C64UltimateDigitalFilter V2.0 - Routed.pdsprj"
+	>> Logic analyser shows that the ATN sometimes bounces high for 20ns from low during the _PC negative edge. _PC should probably be delayed for 30+ns
+	>> Now with C64U the cart init, external RAM populate, DMA setup works.
+	>> But RunScaledSpritesTest and RunScaledSpritesTestDirectMode is unreliable. Maybe one time out of twenty times the test will correctly display two planes that scale properly.
+	>>> Since both work when initialised, it isn't related to direct mode (using latch 4) or the original user port mode.
+	>> But at other times the sprites4 displays are not correct and hardly anything is displayed.
+	>> Sometimes one sprites4 layer init is OK and the other is not OK.
+	>>> This indicates the clipping rectangle is not correct?
+	>>> Also setting the CPU speed to anything but 1MHz, so 2MHz+, results in the scaled sprites drawing with incorrect scale and sizes, indicating data corruption.
+	>>>> Even more strange is that only using right/left will only cause the right sprite to become corrupt. The left sprite is unchanged. But the code updates both every frame...
+	>>> Setting the speed back to 1MHz, or turbo off, results in correct display again, even without moving the joystick.
+	* MObjectDrawWithScaleSizeCheck does not use any adc/sbc, so it's not carry related.
+	** It does read the scale tables, is it because those are getting corrupt when the clock speed changes?!
+	>>> I think it is because the faster clock rate is literally just too fast for the user port interface, so it ends up skipping bytes.
+	>>>> But it doesn't explain why only the moved plane gets corrupted.
+	>>> Cart transfer to external RAM, once started, can run at 8MHz+, but the limiting factor is the ability to init the hardware and get a vblank before the transfer.
 
 
 
@@ -851,3 +866,5 @@
 
 
 Useful to resize and remap an image to a specific palette: C:\Downloads\ImageMagick-7.0.7-4-portable-Q16-x64\magick.exe "C:\Users\marti\Pictures\AH_Eye resized.png" -resize 160x200! -remap "C:\work\c64\CharPack\Palette.bmp" c:\temp\out.png
+
+

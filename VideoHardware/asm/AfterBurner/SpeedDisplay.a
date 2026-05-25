@@ -20,8 +20,8 @@ SpeedDisplayRenderSpritesDirectMode
 	clc
 	adc .targetSpeedWidth
 	sta .targetSpeedWidth
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch4_A
+	+MBus20To32Bit1_WriteMode_A
 	ldx .targetSpeedWidth
 	cpx #2	; Because values smaller than this are actually really wide sprites :)
 	bcc .ignoreUpdate

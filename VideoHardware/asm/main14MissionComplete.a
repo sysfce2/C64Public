@@ -66,6 +66,7 @@ mainLoop
 ;	lda #ProcessorPortAllRAMWithIO
 ;	jsr InitialiseMachine
 
+	jsr Bus20To32Bit1_Init
 	jsr Bus24Bit_Init
 	jsr Bus20To32Bit1_Init
 

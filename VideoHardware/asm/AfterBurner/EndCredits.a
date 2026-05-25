@@ -10,7 +10,7 @@ RunEndCredits
 	sta CIA2PortBRS232
 
 	; We need DMA, which means the APU will probably need to be in passthrough mode and disabled, due to the speed needed
-	jsr APU_ResetDisableClear
+	jsr APU_ResetDisable
 ;	jsr Video_DisableDisplay
 
 	jsr Audio_Init	; Note, not the Audio2, since it is playing music

@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="bin">
+      <UniqueIdentifier>{d1bb1110-9156-434c-827e-c7e7ab61407d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features">
+      <UniqueIdentifier>{fbf7f2c6-ce43-45ea-b0a4-861aec1d5dba}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="readme.txt" />
+    <Text Include="..\stdlib\BreakSerialBus.txt">
+      <Filter>Header Files</Filter>
+    </Text>
+    <Text Include="TODO.txt" />
+    <Text Include="Done.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Linker.a">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\stdlib\BASICEntry80d.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\BASICEntry810.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\BASICEntry900.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\BubbleSort.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\charpad.py">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\Comparisons.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\ExportLabels.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\FeatureEditor.bat">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\GnomeSort.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\Initialise.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\LongBranches.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\MemoryCopy.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\opcodeLengths.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\PETSCII.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\QuickSort.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\RunTests.bat">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\SampleInit.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\stdlib.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\TEDBASICEntry1001.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\test_charpad.py">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\VideoModes.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="..\stdlib\VideoModes_Macros.a">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="ChunkData.a">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="Chunks.a">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="ChunkMacros.a">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="BuildIt.bat">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="bin\Linker.lbl">
+      <Filter>bin</Filter>
+    </None>
+    <None Include="bin\Linker.map">
+      <Filter>bin</Filter>
+    </None>
+    <None Include="bin\Linker.pdb">
+      <Filter>bin</Filter>
+    </None>
+    <None Include="_ChunkData.a">
+      <Filter>bin</Filter>
+    </None>
+    <None Include="_Chunks.a">
+      <Filter>bin</Filter>
+    </None>
+    <None Include="features\TestOutput.feature">
+      <Filter>features</Filter>
+    </None>
+    <None Include="FeatureEditor.bat">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

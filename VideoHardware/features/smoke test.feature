@@ -1320,9 +1320,9 @@ Feature: Smoke test
   @Demo14
   Scenario: Test scaled sprites 4
     Given clear all external devices
-#    Given a new C64 video display
-#    And show C64 video window
-#    And force C64 displayed bank to 3
+    Given a new C64 video display
+    And show C64 video window
+    And force C64 displayed bank to 3
     Given a new video display with overscan and 16 colours
     Given set the video display to RGB colour 5 6 5
     Given set the video display with 32 palette banks
@@ -1602,35 +1602,39 @@ Feature: Smoke test
     # C128 8502 speed, use with BuildForFasterCPU
 #    Given video display processes 12 pixels per instruction
     # Something faster than a C128...
-    Given video display processes 8 pixels per instruction
+#    Given video display processes 8 pixels per instruction
     Given limit video display to 60 fps
 #    Given avoid CPU wait during VBlank for address "Video_WaitVBlank_startGuard"
     And audio refresh window every 0 instructions
     And audio refresh is independent
-
     # Execute pretending we are processing chunks of data sent via USB to the RAM expansion:
-#	# ForHW chunk
-    Given load binary file "tmp\Demo14FileResources_ForHW1.bin" into temporary memory
-    And trim "0" bytes from the start of temporary memory
-    And add temporary memory to the 32 bit interface memory address '0x0'
-	# Debug: Simulate a memory checksum failure
-#    And trim "200000" bytes from the start of temporary memory
-#    And add temporary memory to the 32 bit interface memory address '0x20050'
-	# Comment out the above after debugging checksum failure
-    When I execute the procedure at start for no more than 10000000 instructions until PC = CheckForGameData
-    # Game memory chunk
-    Given load binary file "tmp\Demo14FinalData.bin" into temporary memory
-    And trim "0" bytes from the start of temporary memory
-    And add temporary memory to the 32 bit interface memory address '0x0'
-    Then I continue executing the procedure until return
-#    # Execute the 8MB cartridge code. See: goto skipCartData
-#    And I load cartridge binary "tmp/Demo14Cartridge.bin" type 61 bank size 0x2000 bank address 0x8000 game 1 exrom 0
-#    And I load labels "tmp/main.map"
-#    When I execute the indirect procedure at $fffc until return
-#    # Debug...
-##    When I execute the indirect procedure at $fffc until return or until PC = CheckForHWData
-##    And I enable trace with indent
-##    Then I continue executing the procedure until return
+    * if string "" is not empty
+    # ForHW chunk
+      Given load binary file "tmp\Demo14FileResources_ForHW1.bin" into temporary memory
+      And trim "0" bytes from the start of temporary memory
+      And add temporary memory to the 32 bit interface memory address '0x0'
+  	# Debug: Simulate a memory checksum failure
+#      And trim "200000" bytes from the start of temporary memory
+#      And add temporary memory to the 32 bit interface memory address '0x20050'
+  	# Comment out the above after debugging checksum failure
+      When I execute the procedure at start for no more than 10000000 instructions until PC = CheckForGameData
+      # Game memory chunk
+      Given load binary file "tmp\Demo14FinalData.bin" into temporary memory
+      And trim "0" bytes from the start of temporary memory
+      And add temporary memory to the 32 bit interface memory address '0x0'
+      Then I continue executing the procedure until return
+    * endif
+    # Execute the 8MB cartridge code. See: goto skipCartData
+    * if string "1" is not empty
+    And I load cartridge binary "tmp/Demo14Cartridge.bin" type 61 bank size 0x2000 bank address 0x8000 game 1 exrom 0
+    And I load labels "tmp/main.map"
+#    And I enable trace with indent
+    When I execute the indirect procedure at $fffc until return
+    # Debug...
+#    When I execute the indirect procedure at $fffc until return or until PC = TransferFromCartridgeToExternalRAM
+#    And I enable trace with indent
+#    Then I continue executing the procedure until return
+    * endif
 
 
 

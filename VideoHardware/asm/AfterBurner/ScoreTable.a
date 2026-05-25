@@ -23,7 +23,7 @@ InitScoreTable
 	+MByteValueToAddress_A 250 , .timeout
 
 	+MWordValueToAddress_A -32 - 200 , .scoreYPos
-	+MByteValueToAddress_A 18 , .headerSplitPos
+	+MByteValueToAddress_A 237 , .headerSplitPos
 
 	+MWordValueToAddress_A -432 + 96 , .scoreXPos1
 	+MByteValueToAddress_A 96 , .scoreXPos1Update
@@ -49,36 +49,62 @@ RunScoreTable
 	jsr RunPaletteFade
 	jsr Bus20To32Bit1_Init
 
+	; Only show the clouds, not the tiles
+	jsr Video_SetAddressMergeLayer
+	lda #kBus24Bit_MergeLayer_Register_Control_Visible_0 | kBus24Bit_MergeLayer_Register_Control_ForceOut_0
+	sta CIA2PortBRS232
+	lda #0
+	sta CIA2PortBRS232
+
+	; Enable APU score table render
+	+MAPU_SetDataUpdateBus APUHiscoreOrRunwayFlag
+	+MBus24Bit_Send8BitValue 1
+	+MAPU_SetDataUpdateBus APUHiscoreOrExitFlag
+	+MBus24Bit_Send8BitValue 0
+	; Adjust the vblank wait position so we can hide the bottom of the screen scroll waits
+	+MAPU_SetDataUpdateBus APUData_VBlankYPos
+	+MBus24Bit_Send8BitValue 255
+
 .wl1
 	jsr Video_WaitVBlank
 	jsr Video_StartRasterTimers
 	jsr VBlankUpdatePaletteColours
 
-	; Turn off the char screen, hide the other screens
-	jsr Video_SetAddressVideoLayersEnable
-	+MBus24Bit_Send8BitValue kBus24Bit_VideoLayer_LayersEnable_134
-
 	; Set the scroll position first
 	jsr Video_SetAddressCharScrollRegisters
-	+MBus24Bit_SendLE16BitValue 512+176
+kTopScreenXPos = 512+176
+	+MBus24Bit_SendLE16BitValue kTopScreenXPos
 	+MBus24Bit_SendLE16BitValueFromAddress .scoreYPos
 
-	; Wait for the split position and enable the screen
+	; APU setup: Wait for the split position and enable the screen
+	+MAPU_SetDataUpdateBus APUScoreTableTopSplitPos
 	lda .headerSplitPos
-	+MBus24Bit_WaitUntilRasterYWithA
-	jsr Video_SetAddressVideoLayersEnable
-	+MBus24Bit_Send8BitValue kBus24Bit_VideoLayer_LayersEnable_1234
+	+MBus24Bit_Send8BitValueFromA
 
-!macro MScoreTableEntryUpdate .headerSplitPos , .ypos , .position , .endFrame1 , .scoreUpdate , .move {
+!macro MScoreTableEntryUpdate .headerSplitPos , .ypos , .position , .endFrame1 , .scoreUpdate , .move , .iter {
+	; From raster wait value to actual raster
 	lda .headerSplitPos
-	sec
-	sbc #71 + .ypos
-	+lbcc .endFrame1
-	cmp #6	; This gives enough gap for the code to run at the bottom of the screen
-	+lbcc .endFrame1
-	+MBus24Bit_WaitUntilRasterYWithA
-	jsr Video_SetAddressCharScrollRegisters
+	clc
+	adc #58 + .ypos
+	; Range checking
+	bcs .notOKValue
+	cmp #240
+	bcc .okValue
+.notOKValue
+	; Just queue up some waits off the bottom of the screen, this needs the vblank wait to be adjusted away from this area
+	+MAPU_SetDataUpdateBus APUScoreTablePosY1 + (.iter * APUScoreTablePos_size)
+	+MBus24Bit_Send8BitValue 240 + .iter
+	; Don't calculate the movement if it is off the bottom of the screen
+	jmp .o1
+.okValue
+	pha
+	+MAPU_SetDataUpdateBus APUScoreTablePosY1 + (.iter * APUScoreTablePos_size)
+	pla
+	+MBus24Bit_Send8BitValueFromA
+	
+	+MAPU_SetDataUpdateBus APUScoreTablePosX1 + (.iter * APUScoreTablePos_size)
 	+MBus24Bit_SendLE16BitValueFromAddress .position
+
 	; There is raster time to do the update here when it is displayed
 	lda .scoreUpdate
 	beq .o1
@@ -92,21 +118,21 @@ RunScoreTable
 	}
 .o1
 }
-	+MScoreTableEntryUpdate .headerSplitPos , -4	, .scoreXPos1 , .endFrame1 , .scoreXPos1Update , 1
-	+MScoreTableEntryUpdate .headerSplitPos , 16+3	, .scoreXPos2 , .endFrame1 , .scoreXPos2Update , -1
-	+MScoreTableEntryUpdate .headerSplitPos , 32+3	, .scoreXPos3 , .endFrame1 , .scoreXPos3Update , 1
-	+MScoreTableEntryUpdate .headerSplitPos , 48+3	, .scoreXPos4 , .endFrame1 , .scoreXPos4Update , -1
-	+MScoreTableEntryUpdate .headerSplitPos , 64+3	, .scoreXPos5 , .endFrame1 , .scoreXPos5Update , 1
-	+MScoreTableEntryUpdate .headerSplitPos , 80+3	, .scoreXPos6 , .endFrame1 , .scoreXPos6Update , -1
-	+MScoreTableEntryUpdate .headerSplitPos , 96+3	, .scoreXPos7 , .endFrame1 , .scoreXPos7Update , 1
+	+MScoreTableEntryUpdate .headerSplitPos , -4	, .scoreXPos1 , .endFrame1 , .scoreXPos1Update , 1	, 0
+	+MScoreTableEntryUpdate .headerSplitPos , 16+3	, .scoreXPos2 , .endFrame1 , .scoreXPos2Update , -1	, 1
+	+MScoreTableEntryUpdate .headerSplitPos , 32+3	, .scoreXPos3 , .endFrame1 , .scoreXPos3Update , 1	, 2
+	+MScoreTableEntryUpdate .headerSplitPos , 48+3	, .scoreXPos4 , .endFrame1 , .scoreXPos4Update , -1	, 3
+	+MScoreTableEntryUpdate .headerSplitPos , 64+3	, .scoreXPos5 , .endFrame1 , .scoreXPos5Update , 1	, 4
+	+MScoreTableEntryUpdate .headerSplitPos , 80+3	, .scoreXPos6 , .endFrame1 , .scoreXPos6Update , -1	, 5
+	+MScoreTableEntryUpdate .headerSplitPos , 96+3	, .scoreXPos7 , .endFrame1 , .scoreXPos7Update , 1	, 6
 
 
 .endFrame1
 	; Move the enable screen split up
 	lda .headerSplitPos
-	cmp #230
+	cmp #18
 	beq .o1
-	inc .headerSplitPos
+	dec .headerSplitPos
 	+MIncAddr16 .scoreYPos , .scoreYPos+1
 .o1
 
@@ -126,12 +152,34 @@ RunScoreTable
 	+lbne .wl1
 
 	jsr PaletteFade_Restore
+	jsr ScoreTable_RestoreAPU
 
 	rts
 
 .localTitleScreen_RunGame
 	jsr PaletteFade_Restore
+	jsr ScoreTable_RestoreAPU
 	jmp TitleScreen_RunGame
+
+ScoreTable_RestoreAPU
+	; Enable APU game render
+	+MAPU_SetDataUpdateBus APUHiscoreOrRunwayFlag
+	+MBus24Bit_Send8BitValue 0
+	+MAPU_SetDataUpdateBus APUHiscoreOrExitFlag
+	+MBus24Bit_Send8BitValue 1
+	+MAPU_SetDataUpdateBus APUData_VBlankYPos
+	+MBus24Bit_Send8BitValue APUData_VBlankYPos_Value
+
+	; Allow the APU tiles scrolls to be seen next frame
+	jsr Video_WaitVBlank
+
+	; Restore the tiles with clouds
+	jsr Video_SetAddressMergeLayer
+	lda #kBus24Bit_MergeLayer_Register_Control_Default
+	sta CIA2PortBRS232
+	lda #0
+	sta CIA2PortBRS232
+	rts
 
 !zn
 !convtab "tmp\ConvtabChar8x8.ct" {

@@ -585,8 +585,8 @@ RunGameLanding_CalculateRunway
 .hcl1o
 
 	; Needs to be in write mode afterwards
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch4_A
+	+MBus20To32Bit1_WriteMode_A
 
 	rts
 

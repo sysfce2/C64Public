@@ -6,7 +6,6 @@
 !source "stdlib/stdlib.a"
 ;!source "ScrollerVars.a"
 !source "ScrollEntry_Tusari.a"
-!source "stdlib/LongBranches.a"
 
 Multiplex_DiscardSpritesYPosForSort = 200
 kMapPlacement_maxIndex = 256

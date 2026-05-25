@@ -1,0 +1,12 @@
+!zn
+InitSprites4
+	; Flag
+	+MBus24Bit_Send8BitValue 2
+	; Border adjustments
+	+MBus24Bit_SendLE16BitValue -15
+	+MBus24Bit_SendLE16BitValue -16
+	; Extents
+	+MBus24Bit_Send8BitValue $a3
+	+MBus24Bit_Send8BitValue $70
+
+	rts

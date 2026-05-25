@@ -166,6 +166,7 @@ CommonRestoreScreenStateForTitlesOrGame
 
 !zn
 DisplayRunIntroScreen_CommonSetup
+	jsr Bus20To32Bit1_Init
 	jsr Bus24Bit_Init
 	jsr Bus20To32Bit1_Init
 	jsr APU_ResetDisable

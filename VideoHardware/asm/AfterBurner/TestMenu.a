@@ -1,7 +1,11 @@
 !zn
 DisplayTestMenu
+	jsr Bus20To32Bit1_Init
 	jsr Bus24Bit_Init
 	jsr Bus20To32Bit1_Init
+
+	jsr APU_ResetDisable
+	jsr Audio2_Disable
 
 	jsr Video_InitDisplaySpritesScrollsBackground
 	jsr Video_SetAddressMergeLayer
@@ -34,6 +38,7 @@ DisplayTestMenu
 	+MBus24Bit_Send8BitValue kBus24Bit_VideoLayer_LayersEnable_2
 
 	jsr Video_WaitVBlank
+	inc VIC2BorderColour
 
 !macro MDisplayText_Char1 .pos , .text , .len {
 	+MBus24Bit_SetAddress_AXY kBus24Bit_CharScreenMap_EBBS , kBus24Bit_CharScreenMap + .pos
@@ -61,51 +66,48 @@ DisplayTestMenu
 	+MDisplayText_Char1 Text_8x8_musicPlay2_Pos , Text_8x8_musicPlay2 , Text_8x8_musicPlay2_size
 	+MDisplayText_Char1 Text_8x8_musicPlay3_Pos , Text_8x8_musicPlay3 , Text_8x8_musicPlay3_size
 	+MDisplayText_Char1 Text_8x8_musicPlay6_Pos , Text_8x8_musicPlay6 , Text_8x8_musicPlay6_size
+	+MDisplayText_Char1 Text_8x8_testScaledSprites_Pos , Text_8x8_testScaledSprites , Text_8x8_testScaledSprites_size
+	+MDisplayText_Char1 Text_8x8_testScaledSpritesDirectMode_Pos , Text_8x8_testScaledSpritesDirectMode , Text_8x8_testScaledSpritesDirectMode_size
+	+MDisplayText_Char1 Text_8x8_testChars1_Pos , Text_8x8_testChars1 , Text_8x8_testChars1_size
+	+MDisplayText_Char1 Text_8x8_testChars2_Pos , Text_8x8_testChars2 , Text_8x8_testChars2_size
+	+MDisplayText_Char1 Text_8x8_testTiles_Pos , Text_8x8_testTiles , Text_8x8_testTiles_size
+	+MDisplayText_Char1 Text_8x8_testMode7_Pos , Text_8x8_testMode7 , Text_8x8_testMode7_size
+	; Last
 	+MDisplayText_Char1 Text_8x8_instructions_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y8_colour , Text_8x8_instructions , Text_8x8_instructions_size
 
 	jsr EndFlashAll
 
 .l1
 	jsr Video_WaitVBlank
+	inc VIC2BorderColour
 
 .selected = *+1
 	lda #0
+!macro MMenuDrawOption .option , .end , .eor , .flash , .flashEnd {
+	cmp #.option
 	bne .not0
 	lda .eor
 	and #8
 	beq .is0
-	jsr .flashEnd0
+	jsr .flashEnd
 	jmp .end
 .is0
-	jsr .flash0
+	jsr .flash
 	jmp .end
 .not0
-	cmp #1
-	bne .not1
-	lda .eor
-	and #8
-	beq .is1
-	jsr .flashEnd1
-	jmp .end
-.is1
-	jsr .flash1
-	jmp .end
-.not1
-	cmp #2
-	bne .not2
-	lda .eor
-	and #8
-	beq .is2
-	jsr .flashEnd2
-	jmp .end
-.is2
-	jsr .flash2
-	jmp .end
-.not2
+}
+	+MMenuDrawOption 0 , .end , .eor , .flash0 , .flashEnd0
+	+MMenuDrawOption 1 , .end , .eor , .flash1 , .flashEnd1
+	+MMenuDrawOption 2 , .end , .eor , .flash2 , .flashEnd2
+	+MMenuDrawOption 3 , .end , .eor , .flash3 , .flashEnd3
+	+MMenuDrawOption 4 , .end , .eor , .flash4 , .flashEnd4
+	+MMenuDrawOption 5 , .end , .eor , .flash5 , .flashEnd5
+	+MMenuDrawOption 6 , .end , .eor , .flash6 , .flashEnd6
+	+MMenuDrawOption 7 , .end , .eor , .flash7 , .flashEnd7
+	+MMenuDrawOption 8 , .end , .eor , .flash8 , .flashEnd8
 .end
 	inc .eor
 
-;	jsr Music_CheckTime
 !labelredefine
 	lda CIA1KeyboardColumnJoystickA
 	+WaitForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Up , .notUp
@@ -118,7 +120,7 @@ DisplayTestMenu
 .notDown
 
 	lda .selected
-	cmp #3
+	cmp #9
 	bcc .ok1
 	lda #0
 	sta .selected
@@ -126,20 +128,22 @@ DisplayTestMenu
 
 	+WaitForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Fire , .notFire
 	lda .selected
+!macro MMenuProcessOption .option , .end , .choice {
+	cmp #.option
 	bne .notPlay0
-	jsr Music_Play2
-	jmp .notFire
+	jsr .choice
+	jmp .end
 .notPlay0
-	cmp #1
-	bne .notPlay1
-	jsr Music_Play3
-	jmp .notFire
-.notPlay1
-	cmp #2
-	bne .notPlay2
-	jsr Music_Play6
-	jmp .notFire
-.notPlay2
+}
+	+MMenuProcessOption 0 , .notFire , Music_Play2
+	+MMenuProcessOption 1 , .notFire , Music_Play3
+	+MMenuProcessOption 2 , .notFire , Music_Play6
+	+MMenuProcessOption 3 , DisplayTestMenu , RunScaledSpritesTest
+	+MMenuProcessOption 4 , DisplayTestMenu , RunScaledSpritesTestDirectMode
+	+MMenuProcessOption 5 , .notFire , RunChars1Test
+	+MMenuProcessOption 6 , .notFire , RunChars2Test
+	+MMenuProcessOption 7 , .notFire , RunTilesTest
+	+MMenuProcessOption 8 , .notFire , RunMode7Test
 .notFire
 !labelredefineend
 
@@ -152,48 +156,468 @@ DisplayTestMenu
 .flash0
 	+MDisplayText_FlashColour Text_8x8_musicPlay2_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y24_colour , Text_8x8_musicPlay2_size
 	rts
-.flash1
-	+MDisplayText_FlashColour Text_8x8_musicPlay3_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y24_colour , Text_8x8_musicPlay3_size
-	rts
-.flash2
-	+MDisplayText_FlashColour Text_8x8_musicPlay6_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y24_colour , Text_8x8_musicPlay6_size
-	rts
 .flashEnd0
 	+MDisplayText_FlashColour Text_8x8_musicPlay2_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y16_colour , Text_8x8_musicPlay2_size
+	rts
+.flash1
+	+MDisplayText_FlashColour Text_8x8_musicPlay3_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y24_colour , Text_8x8_musicPlay3_size
 	rts
 .flashEnd1
 	+MDisplayText_FlashColour Text_8x8_musicPlay3_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y16_colour , Text_8x8_musicPlay3_size
 	rts
+.flash2
+	+MDisplayText_FlashColour Text_8x8_musicPlay6_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y24_colour , Text_8x8_musicPlay6_size
+	rts
 .flashEnd2
 	+MDisplayText_FlashColour Text_8x8_musicPlay6_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y16_colour , Text_8x8_musicPlay6_size
 	rts
+.flash3
+	+MDisplayText_FlashColour Text_8x8_testScaledSprites_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y24_colour , Text_8x8_testScaledSprites_size
+	rts
+.flashEnd3
+	+MDisplayText_FlashColour Text_8x8_testScaledSprites_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y16_colour , Text_8x8_testScaledSprites_size
+	rts
+.flash4
+	+MDisplayText_FlashColour Text_8x8_testScaledSpritesDirectMode_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y24_colour , Text_8x8_testScaledSpritesDirectMode_size
+	rts
+.flashEnd4
+	+MDisplayText_FlashColour Text_8x8_testScaledSpritesDirectMode_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y16_colour , Text_8x8_testScaledSpritesDirectMode_size
+	rts
+.flash5
+	+MDisplayText_FlashColour Text_8x8_testChars1_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y24_colour , Text_8x8_testChars1_size
+	rts
+.flashEnd5
+	+MDisplayText_FlashColour Text_8x8_testChars1_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y16_colour , Text_8x8_testChars1_size
+	rts
+.flash6
+	+MDisplayText_FlashColour Text_8x8_testChars2_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y24_colour , Text_8x8_testChars2_size
+	rts
+.flashEnd6
+	+MDisplayText_FlashColour Text_8x8_testChars2_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y16_colour , Text_8x8_testChars2_size
+	rts
+.flash7
+	+MDisplayText_FlashColour Text_8x8_testTiles_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y24_colour , Text_8x8_testTiles_size
+	rts
+.flashEnd7
+	+MDisplayText_FlashColour Text_8x8_testTiles_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y16_colour , Text_8x8_testTiles_size
+	rts
+.flash8
+	+MDisplayText_FlashColour Text_8x8_testMode7_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y24_colour , Text_8x8_testMode7_size
+	rts
+.flashEnd8
+	+MDisplayText_FlashColour Text_8x8_testMode7_Pos , kTileScreenDebug____tmp_Demo14TitleChars_map_bin_x8_y16_colour , Text_8x8_testMode7_size
+	rts
+
 EndFlashAll
 	jsr Video_WaitVBlank
+	inc VIC2BorderColour
 	jsr .flashEnd0
 	jsr .flashEnd1
 	jsr .flashEnd2
+	jsr Video_WaitVBlank
+	inc VIC2BorderColour
+	jsr .flashEnd3
+	jsr .flashEnd4
+	jsr .flashEnd5
+	jsr Video_WaitVBlank
+	inc VIC2BorderColour
+	jsr .flashEnd6
+	jsr .flashEnd7
+	jsr .flashEnd8
 	rts
 
 
 !source "tmp\Demo14TitleChars_map.bin.debug.optimised.txt"
 !convtab "tmp\ConvtabChar8x8.ct" {
-Text_8x8_musicPlay2_Pos = (12 * kBus24Bit_CharScreenWidth) + 7
+Text_8x8_musicPlay2_Pos = (9 * kBus24Bit_CharScreenWidth) + 7
 Text_8x8_musicPlay2
 !tx "play music 2. maximum power"
 Text_8x8_musicPlay2_size = *-Text_8x8_musicPlay2
 
-Text_8x8_musicPlay3_Pos = (14 * kBus24Bit_CharScreenWidth) + 7
+Text_8x8_musicPlay3_Pos = (11 * kBus24Bit_CharScreenWidth) + 7
 Text_8x8_musicPlay3
 !tx "play music 3. afterburner"
 Text_8x8_musicPlay3_size = *-Text_8x8_musicPlay3
 
-Text_8x8_musicPlay6_Pos = (16 * kBus24Bit_CharScreenWidth) + 7
+Text_8x8_musicPlay6_Pos = (13 * kBus24Bit_CharScreenWidth) + 7
 Text_8x8_musicPlay6
 !tx "play music 6. city 202"
 Text_8x8_musicPlay6_size = *-Text_8x8_musicPlay6
 
-Text_8x8_instructions_Pos = (20 * kBus24Bit_CharScreenWidth) + 8
+Text_8x8_testScaledSprites_Pos = (15 * kBus24Bit_CharScreenWidth) + 7
+Text_8x8_testScaledSprites
+!tx "test scaled sprites"
+Text_8x8_testScaledSprites_size = *-Text_8x8_testScaledSprites
+
+Text_8x8_testScaledSpritesDirectMode_Pos = (17 * kBus24Bit_CharScreenWidth) + 7
+Text_8x8_testScaledSpritesDirectMode
+!tx "test scaled sprites direct mode"
+Text_8x8_testScaledSpritesDirectMode_size = *-Text_8x8_testScaledSpritesDirectMode
+
+Text_8x8_testChars1_Pos = (19 * kBus24Bit_CharScreenWidth) + 7
+Text_8x8_testChars1
+!tx "test Chars1"
+Text_8x8_testChars1_size = *-Text_8x8_testChars1
+
+Text_8x8_testChars2_Pos = (21 * kBus24Bit_CharScreenWidth) + 7
+Text_8x8_testChars2
+!tx "test Chars2"
+Text_8x8_testChars2_size = *-Text_8x8_testChars2
+
+Text_8x8_testTiles_Pos = (23 * kBus24Bit_CharScreenWidth) + 7
+Text_8x8_testTiles
+!tx "test Tiles"
+Text_8x8_testTiles_size = *-Text_8x8_testTiles
+
+Text_8x8_testMode7_Pos = (25 * kBus24Bit_CharScreenWidth) + 7
+Text_8x8_testMode7
+!tx "test Mode7"
+Text_8x8_testMode7_size = *-Text_8x8_testMode7
+
+; Last
+Text_8x8_instructions_Pos = (27 * kBus24Bit_CharScreenWidth) + 8
 Text_8x8_instructions
 !tx "use joystick up/down/fire"
 Text_8x8_instructions_size = *-Text_8x8_instructions
 }
+
+!source "tmp\Demo14ScaledSprites4Sheet.txtVars.a"
+!source "tmp/Demo14ScaledSprites4SheetOptimisedTestMenu.txtTables.a"
+
+!source "AfterBurner/ScaledSpriteCommon.a"
+
+TitleDrawA
+	+MObjectDrawWithScaleSizeCheck kVarsEmitSpriteFrame_t_637_0_0_0_colour , kVarsEmitSpriteFrame_t_637_0_0_0_tileWidthScaleTab , kVarsEmitSpriteFrame_t_637_0_0_0_tileHeightScaleTab , kVarsEmitSpriteFrame_t_637_0_0_0_tileAddress , kVarsEmitSpriteFrame_t_637_0_0_0_tileWidth
+	rts
+TitleDrawF
+	+MObjectDrawWithScaleSizeCheck kVarsEmitSpriteFrame_t_1009_0_0_0_colour , kVarsEmitSpriteFrame_t_1009_0_0_0_tileWidthScaleTab , kVarsEmitSpriteFrame_t_1009_0_0_0_tileHeightScaleTab , kVarsEmitSpriteFrame_t_1009_0_0_0_tileAddress , kVarsEmitSpriteFrame_t_1009_0_0_0_tileWidth
+	rts
+
+; Stubbed out
+RenderPreviousFramesPassed
+	rts
+
+!zn
+RunScaledSpritesTest
+	+WaitForFireRelease_A
+
+	jsr Video_SetAddressVideoPriorityRegister
+	+MBus24Bit_VideoLayer_EmitPriority_NearToFar_A kBus24Bit_VideoLayer_Priority_Pixel0 , kBus24Bit_VideoLayer_Priority_Pixel2 , kBus24Bit_VideoLayer_Priority_Chars , kBus24Bit_VideoLayer_Priority_Chars
+
+	jsr Video_SetAddressVideoLayersEnable
+	+MBus24Bit_Send8BitValue kBus24Bit_VideoLayer_LayersEnable_123
+
+	jsr Video_SetAddressVideoPaletteBankRegister
+	+MBus24Bit_Send8BitValue $07
+
+	jsr Video_SetAddressVideoPaletteLayersRegister
+	+MBus24Bit_Send8BitValue %00010001
+
+	+MBus24Bit_SetAddress_A kBus24Bit_Sprites4_EBBS , kBus24Bit_Sprites4_Controls
+	+MBus24Bit_Send8BitValue 0
+	+MBus24Bit_SetAddress_A kBus24Bit_Sprites4_EBBS , kBus24Bit_Sprites4_Controls
+	jsr InitSprites4
+
+	+MBus24Bit_SetAddress_A kBus24Bit_Sprites4_EBBS , kBus24Bit_Sprites4_Controls2
+	+MBus24Bit_Send8BitValue 0
+	+MBus24Bit_SetAddress_A kBus24Bit_Sprites4_EBBS , kBus24Bit_Sprites4_Controls2
+	jsr InitSprites4
+
+.rspt1
+	jsr Video_WaitVBlank
+	jsr Video_StartRasterTimers
+	jsr Bus20To32Bit1_Init
+	inc VIC2BorderColour
+
+;	jsr ResetInterfaceAndStartSendingScaledSprites
+	+MBus24Bit_SetAddress_A kBus24Bit_Sprites4_EBBS , kBus24Bit_Sprites4_Controls
+	+MBus24Bit_Send8BitValue 2
+
+	+MBus24Bit_SetAddress_A kBus24Bit_Sprites4_EBBS , kBus24Bit_Sprites4_Registers
+.sms1	ldx #$18
+	beq .no1
+	cpx #UsingMaxHardwareScaleTabValue
+	bcs .no1
+	lda #0
+	sta zeroPage_Temp3
+	lda #78
+	sta zeroPage_Temp5
+	lda #40
+	sta zeroPage_Temp4
+	jsr TitleDrawA
+.no1
+;	jsr TerminateScaledSpritesAndSignalReady
+	jsr TerminateScaledSpritesList
+	+MBus24Bit_SetAddress_A kBus24Bit_Sprites4_EBBS , kBus24Bit_Sprites4_Controls
+	+MBus24Bit_Send8BitValue 3
+
+;	jsr ResetInterfaceAndStartSendingScaledSprites2
+	+MBus24Bit_SetAddress_A kBus24Bit_Sprites4_EBBS , kBus24Bit_Sprites4_Controls2
+	+MBus24Bit_Send8BitValue 2
+
+	+MBus24Bit_SetAddress_A kBus24Bit_Sprites4_EBBS , kBus24Bit_Sprites4_Registers2
+
+.sms2	ldx #$20
+	beq .no2
+	cpx #UsingMaxHardwareScaleTabValue
+	bcs .no2
+	lda #0
+	sta zeroPage_Temp3
+	lda #178
+	sta zeroPage_Temp5
+	lda #80
+	sta zeroPage_Temp4
+	jsr TitleDrawF
+.no2
+;	jsr TerminateScaledSpritesAndSignalReady2
+	jsr TerminateScaledSpritesList
+	+MBus24Bit_SetAddress_A kBus24Bit_Sprites4_EBBS , kBus24Bit_Sprites4_Controls2
+	+MBus24Bit_Send8BitValue 3
+
+	+TestForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Up , .notUp
+	inc .sms1+1
+.notUp
+	+TestForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Down , .notDown
+	dec .sms1+1
+.notDown
+
+	+TestForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Left , .notLeft
+	inc .sms2+1
+.notLeft
+	+TestForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Right , .notRight
+	dec .sms2+1
+.notRight
+
+	+LWaitForFireALoop_A .rspt1
+
+	rts
+
+	
+!zn
+RunScaledSpritesTestDirectMode
+	+WaitForFireRelease_A
+
+	jsr Video_SetAddressVideoPriorityRegister
+	+MBus24Bit_VideoLayer_EmitPriority_NearToFar_A kBus24Bit_VideoLayer_Priority_Pixel0 , kBus24Bit_VideoLayer_Priority_Pixel2 , kBus24Bit_VideoLayer_Priority_Chars , kBus24Bit_VideoLayer_Priority_Chars
+
+	jsr Video_SetAddressVideoLayersEnable
+	+MBus24Bit_Send8BitValue kBus24Bit_VideoLayer_LayersEnable_123
+
+	jsr Video_SetAddressVideoPaletteBankRegister
+	+MBus24Bit_Send8BitValue $07
+
+	jsr Video_SetAddressVideoPaletteLayersRegister
+	+MBus24Bit_Send8BitValue %00010001
+
+	+MBus24Bit_SetAddress_A kBus24Bit_Sprites4_EBBS , kBus24Bit_Sprites4_Controls
+	+MBus24Bit_Send8BitValue 0
+	+MBus24Bit_SetAddress_A kBus24Bit_Sprites4_EBBS , kBus24Bit_Sprites4_Controls
+	jsr InitSprites4
+
+	+MBus24Bit_SetAddress_A kBus24Bit_Sprites4_EBBS , kBus24Bit_Sprites4_Controls2
+	+MBus24Bit_Send8BitValue 0
+	+MBus24Bit_SetAddress_A kBus24Bit_Sprites4_EBBS , kBus24Bit_Sprites4_Controls2
+	jsr InitSprites4
+
+.rspt1
+	jsr Video_WaitVBlank
+	jsr Video_StartRasterTimers
+	inc VIC2BorderColour
+
+	jsr ResetInterfaceAndStartSendingScaledSprites
+.sms1	ldx #$18
+	beq .no1
+	cpx #UsingMaxHardwareScaleTabValue
+	bcs .no1
+	lda #0
+	sta zeroPage_Temp3
+	lda #78
+	sta zeroPage_Temp5
+	lda #40
+	sta zeroPage_Temp4
+	jsr TitleDrawA
+.no1
+	jsr TerminateScaledSpritesAndSignalReady
+
+	jsr ResetInterfaceAndStartSendingScaledSprites2
+.sms2	ldx #$20
+	beq .no2
+	cpx #UsingMaxHardwareScaleTabValue
+	bcs .no2
+	lda #0
+	sta zeroPage_Temp3
+	lda #178
+	sta zeroPage_Temp5
+	lda #80
+	sta zeroPage_Temp4
+	jsr TitleDrawF
+.no2
+	jsr TerminateScaledSpritesAndSignalReady2
+
+	+TestForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Up , .notUp
+	inc .sms1+1
+.notUp
+	+TestForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Down , .notDown
+	dec .sms1+1
+.notDown
+
+	+TestForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Left , .notLeft
+	inc .sms2+1
+.notLeft
+	+TestForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Right , .notRight
+	dec .sms2+1
+.notRight
+
+	+WaitForFireALoop_A .rspt1
+
+	rts
+
+
+!source "AfterBurner\InitSprites4.a"
+
+
+!zn
+CommonScrollInit
+	+WaitForFireRelease_A
+
+	jsr Video_SetAddressVideoPriorityRegister
+	+MBus24Bit_VideoLayer_EmitPriority_NearToFar_A kBus24Bit_VideoLayer_Priority_Pixel0 , kBus24Bit_VideoLayer_Priority_Pixel1 , kBus24Bit_VideoLayer_Priority_Pixel2 , kBus24Bit_VideoLayer_Priority_Pixel3
+
+	jsr Video_SetAddressVideoLayersEnable
+	+MBus24Bit_Send8BitValue kBus24Bit_VideoLayer_LayersEnable_1234
+
+	jsr Video_SetAddressMergeLayer
+	+MBus24Bit_Send8BitValueA kBus24Bit_MergeLayer_Register_Control_Default
+	+MBus24Bit_Send8BitValueX 0
+	+MBus24Bit_Send8BitValueFromA
+	+MBus24Bit_Send8BitValueFromX
+	rts
+
+CharsScrollPos
+	!word 0 , 0
+
+CommonScrollMove
+	+TestForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Up , .notUp
+	+MIncAddrWord CharsScrollPos+2
+.notUp
+	+TestForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Down , .notDown
+	+MDecAddrWord_A CharsScrollPos+2
+.notDown
+
+	+TestForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Left , .notLeft
+	+MIncAddrWord CharsScrollPos
+.notLeft
+	+TestForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Right , .notRight
+	+MDecAddrWord_A CharsScrollPos
+.notRight
+	rts
+
+!zn
+RunChars1Test
+	jsr CommonScrollInit
+
+.rspt1
+	jsr Video_WaitVBlank
+	jsr Video_StartRasterTimers
+	inc VIC2BorderColour
+
+	jsr Video_SetAddressCharScrollRegisters
+	+MBus24Bit_FastSpeedCopy CharsScrollPos , 4
+
+	jsr CommonScrollMove
+
+	+WaitForFireALoop_A .rspt1
+
+	rts
+
+!zn
+RunChars2Test
+	jsr CommonScrollInit
+
+.rspt1
+	jsr Video_WaitVBlank
+	jsr Video_StartRasterTimers
+	inc VIC2BorderColour
+
+	+MBus24Bit_SetAddress_A kBus24Bit_CharScreen_EBBS , $a801
+	+MBus24Bit_FastSpeedCopy CharsScrollPos , 4
+
+	jsr CommonScrollMove
+
+	+WaitForFireALoop_A .rspt1
+
+	rts
+
+
+!zn
+RunTilesTest
+	jsr CommonScrollInit
+
+.rspt1
+	jsr Video_WaitVBlank
+	jsr Video_StartRasterTimers
+	inc VIC2BorderColour
+
+	jsr Video_SetAddressTileScrollRegisters
+	+MBus24Bit_FastSpeedCopy CharsScrollPos , 4
+
+	jsr CommonScrollMove
+
+	+WaitForFireALoop_A .rspt1
+
+	rts
+
+
+!zn
+Mode7Regs
+
+Mode7Regs_scale_dX
+	+MLittleEndian24Bit $100
+Mode7Regs_scale_dXY
+	+MLittleEndian24Bit 0
+Mode7Regs_scale_dY
+	+MLittleEndian24Bit $100
+Mode7Regs_scale_dYX
+	+MLittleEndian24Bit 0
+
+Mode7Regs_xpos
+	+MLittleEndian24Bit -10240
+Mode7Regs_ypos
+	+MLittleEndian24Bit -10240
+
+	!by 0
+	!by 0
+
+Mode7Regs_backgroundColour !by 0
+Mode7Regs_flags !by $1f
+Mode7RegsSize = * - Mode7Regs
+
+RunMode7Test
+	jsr CommonScrollInit
+
+.rspt1
+	jsr Video_WaitVBlank
+	jsr Video_StartRasterTimers
+	inc VIC2BorderColour
+
+	jsr Video_SetAddressMode7
+	+MBus24Bit_FastSpeedCopy Mode7Regs , Mode7RegsSize
+
+	+TestForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Up , .notUp
+	+MIncAddr24 Mode7Regs_scale_dY , Mode7Regs_scale_dY+1, Mode7Regs_scale_dY+2
+.notUp
+	+TestForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Down , .notDown
+	+MDecAddr24_A Mode7Regs_scale_dY
+.notDown
+
+	+TestForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Left , .notLeft
+	+MIncAddr24 Mode7Regs_scale_dX , Mode7Regs_scale_dX+1, Mode7Regs_scale_dX+2
+.notLeft
+	+TestForPortBitsLoop_A CIA1KeyboardColumnJoystickA , JoystickBits_Right , .notRight
+	+MDecAddr24_A Mode7Regs_scale_dX
+.notRight
+	+WaitForFireALoop_A .lrspt1
+
+	rts
+
+.lrspt1 jmp .rspt1

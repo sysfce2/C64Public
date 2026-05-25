@@ -1,0 +1,11 @@
+* Linker, first pass data driven tool
+
+
+* Optimise for repeated page length blocks and an end short copy
+
+
+* Reduce the copy to optimised cases for reverse copying if there is an overlap
+	>> Scenario: Test overlapping source and destination
+
+
+* Tests

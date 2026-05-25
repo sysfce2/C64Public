@@ -93,6 +93,10 @@ def main(argv):
         fileIn = open(argv[2], "rb")
         inBytes = list(fileIn.read())
         fileIn.close()
+        testdataFileSigned = open(argv[4] + ".signed.bin", "wb")
+        for theByte in inBytes:
+            testdataFileSigned.write(bytes([(int(theByte) - 0x80) & 0xff]))
+        testdataFileSigned.close()
 
         print("input size byte", len(inBytes))
 

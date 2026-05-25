@@ -44,6 +44,7 @@ start
 
 !source "AfterBurner/CommonBootDefinesPre.a"
 !source "tmp\CommonBootDefines.a"
+!source "tmp\CommonAPUDefines.a"
 !source "BombJack/stdlib/Audio.a"
 !source "BombJack/stdlib/Video.a"
 !source "BerzerkRedux/Rand.a"
@@ -91,14 +92,14 @@ mainLoop
 	+MByteValueToAddress_A 5 , GamePaletteBank
 
 
+	jsr Bus20To32Bit1_Init
 	jsr Bus24Bit_Init
 	jsr Bus20To32Bit1_Init
-	jsr APU_ResetDisableClear
+	jsr APU_ResetDisable
 
 	jsr Audio_Init
 	jsr Audio2_Disable
 
-	jsr SetupAPU
 	jsr OneTimeInit
 	jsr EntitySortInit
 
@@ -137,7 +138,6 @@ TitleScreen_RunGame
 	jmp CommonBootCode_JumpTable_LoadRun_Game
 
 !source "AfterBurner/Init.a"
-!source "AfterBurner/APUHardware.a"
 !source "AfterBurner/APU.a"
 !source "AfterBurner/EntitySystem.a"
 !source "AfterBurner/EntitySystemSpriteDraw.a"
@@ -148,6 +148,11 @@ TitleScreen_RunGame
 !source "AfterBurner/PlayerControl.a"
 !source "AfterBurner/TextUpdates.a"
 !source "AfterBurner/ScoreTable.a"
+!source "AfterBurner/ScoreHandlers.a"
+!source "AfterBurner/SamplePlay.a"
+!source "AfterBurner/Music.a"
+!source "AfterBurner/Audio2.a"
+!source "Citadel2\asm\Score.a"
 
 
 ; Stub these out
@@ -192,11 +197,6 @@ MissionCompleteDisplayRenderSpritesDirectMode
 !source "AfterBurner/Enemy.a"
 !source "AfterBurner/LandscapeAnimate.a"
 !source "AfterBurner/RadarDisplay.a"
-!source "Citadel2\asm\Score.a"
-!source "AfterBurner/Audio2.a"
-!source "AfterBurner/Music.a"
-!source "AfterBurner/SamplePlay.a"
-!source "AfterBurner/ScoreHandlers.a"
 
 !source "BombJack/stdlib/Bus20To32Bit1_CopyFrom.a"
 

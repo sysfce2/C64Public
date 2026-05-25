@@ -1,0 +1,13 @@
+; Default state is ProcessorPortAllRAM
+	+MSetPP ProcessorPortDefault
+	+MCopy_FromSizeDest Colours , ColoursEnd-Colours , COLOURRAM
+	+MSetAddr VIC2Colour_White , VIC2BorderColour
+	+MSetPP ProcessorPortAllRAM
+	+MCopy_FromSizeDest Screen , ScreenEnd-Screen , VIC2_Bank3 + VIC2MemorySetup_CharsSize
+	+MCopy_FromSizeDest Chars , CharsEnd-Chars , VIC2_Bank3
+	+MCopy_FromSizeDest Code , CodeEnd-Code , CodeRealStart
+	+MCopy_FromSizeDest ExactPage2 , ExactPage2End-ExactPage2 , $500
+	+MCopy_FromSizeDest ExactPage , ExactPageEnd-ExactPage , $580
+	+MCopy_FromSizeDest SmallData , SmallDataEnd-SmallData , $780
+	+MSetPP ProcessorPortAllRAMWithIO
+	+MStartWithRts CodeRealStart

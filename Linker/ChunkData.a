@@ -1,0 +1,41 @@
+Colours
+!bin "../CharPack/colours.bin"
+ColoursEnd
+Chars
+!bin "../CharPack/chars.bin"
+CharsEnd
+Screen
+!bin "../CharPack/screen.bin"
+ScreenEnd
+ExactPage
+!fill 256,3
+ExactPageEnd
+ExactPage2
+!fill 256,0
+!fill 256,1
+ExactPage2End
+SmallData
+!by 10,11,12,13,14,15,16,17,18,19,20
+SmallDataEnd
+
+Code
+!pseudopc $800 {
+CodeRealStart
+	+MStopInitStack_X
+
+	+MVIC2MemorySetup_ScreenChar_A VIC2_Bank3 + VIC2MemorySetup_CharsSize , VIC2_Bank3
+	+MAToAddress_A  VIC2MemorySetup
+	+MByteValueToAddress_A CIA2PortASerialBusVICBank_Bank3 , CIA2PortASerialBusVICBank
+	+MByteValueToAddress_A VIC2ScreenControlHDefault | kVIC2ScreenControlHBits_Multicolour, VIC2ScreenControlH
+
+	+MByteValueToAddress_A VIC2Colour_LightBlue , VIC2ScreenColour
+	+MByteValueToAddress_A VIC2Colour_DarkGrey , VIC2ExtraBackgroundColour1
+	+MByteValueToAddress_A VIC2Colour_Grey , VIC2ExtraBackgroundColour2
+
+	+MByteValueToAddress_A VIC2ScreenControlVDefault , VIC2ScreenControlV
+
+.l1	inc VIC2BorderColour
+	jmp .l1
+
+}
+CodeEnd

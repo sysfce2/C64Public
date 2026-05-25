@@ -97,15 +97,7 @@ RealCodeStart
 ;	jsr CINT
 
 	; Check for runstop being pressed
-	lda #$ff
-	sta CIA1PortADDR
-	lda #0
-	sta CIA1PortBDDR
-	lda #$7f
-	sta CIA1KeyboardColumnJoystickA
-;	lda #$7f
-	cmp CIA1KeyboardRowsJoystickB
-	bne .notRunstop
+	+MInitKeyboardCheckForRunStop .notRunstop
 
 	lda #VIC2Colour_Green
 	sta VIC2BorderColour

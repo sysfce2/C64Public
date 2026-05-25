@@ -4,8 +4,8 @@
 .ypos !by $90
 
 MissionCompleteDisplayRenderSpritesDirectMode
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch4_A
+	+MBus20To32Bit1_WriteMode_A
 
 	lda #40
 	sec

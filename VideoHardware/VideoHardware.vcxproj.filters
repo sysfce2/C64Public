@@ -885,6 +885,15 @@
     <Library Include="asm\AfterBurner\TestMenu.a">
       <Filter>Source Files\asm\AfterBurner</Filter>
     </Library>
+    <Library Include="asm\AfterBurner\InitSprites4.a">
+      <Filter>Source Files\asm\AfterBurner</Filter>
+    </Library>
+    <Library Include="asm\main14APU.a">
+      <Filter>Source Files\asm</Filter>
+    </Library>
+    <Library Include="..\..\BombJack\stdlib\APUSetup.a">
+      <Filter>Header Files\BombJack\stdlib</Filter>
+    </Library>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Done.txt" />

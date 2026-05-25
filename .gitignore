@@ -279,3 +279,6 @@ MusicMultiSelect/MusicMultiSelect.prg
 MusicMultiSelect/.vs/MusicMultiSelect/v15/Browse.VC.opendb
 MusicMultiSelect/MultiSelectSystem.prg
 MusicMultiSelect/MusicMultiSelect.crt
+*.opendb
+Linker/_Chunks.a
+Linker/_ChunkData.a

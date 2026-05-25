@@ -80,8 +80,8 @@ Game_TestLockReticleWithEntities
 
 !zn
 Game_RenderLockReticles
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch4_A
+	+MBus20To32Bit1_WriteMode_A
 
 	ldy #kGameLockReticles_EntityIDs_max-1
 .ce1

@@ -1,0 +1,82 @@
+; kUsed_* is used to enable various code function based on usage
+
+!set kUsed_MSetPP = 0
+!macro MSetPP .val {
+	!set kUsed_MSetPP = kUsed_MSetPP + 1
+	!by <SetPP , .val
+}
+
+!set kUsed_ForwardCopyPage = 0
+!set kUsed_ForwardCopySmall = 0
+!set kUsed_ReverseCopyPage = 0
+!set kUsed_ReverseCopySmall = 0
+!macro MEmitForwardCopyPage .start , .size , .dest {
+!if .size >= $100 {
+	!set kUsed_ForwardCopyPage = kUsed_ForwardCopyPage + 1
+	!by <ForwardCopyPage
+	!word .start
+	!by >.size
+	!word .dest
+}
+}
+!macro MEmitForwardCopyPageSmall .start , .size , .dest {
+!if <.size > 0 {
+!set .start = .start + ((>.size) * $100)
+!set .dest = .dest + ((>.size) * $100)
+!set .size = <.size
+	!set kUsed_ForwardCopySmall = kUsed_ForwardCopySmall + 1
+	!by <ForwardCopySmall
+	!word .start
+	!by <.size
+	!word .dest
+}
+}
+
+
+!macro MEmitReverseCopyPage .start , .size , .dest {
+!if .size >= $100 {
+	!set kUsed_ReverseCopyPage = kUsed_ReverseCopyPage + 1
+	!by <ReverseCopyPage
+	!word .start + ((>.size) * $100) - $100
+	!by >.size
+	!word .dest + ((>.size) * $100) - $100
+}
+}
+!macro MEmitReverseCopyPageSmall .start , .size , .dest {
+!if <.size > 0 {
+!set .start = .start + ((>.size) * $100)
+!set .dest = .dest + ((>.size) * $100)
+!set .size = <.size
+	!set kUsed_ReverseCopySmall = kUsed_ReverseCopySmall + 1
+	!by <ReverseCopySmall
+	!word .start - 1
+	!by <.size
+	!word .dest - 1
+}
+}
+
+
+!macro MCopy_FromSizeDest .start , .size , .dest {
+!if (.dest >= .start) and (.dest < (.start + .size)) {
+	+MEmitReverseCopyPageSmall .start , .size , .dest
+	+MEmitReverseCopyPage .start , .size , .dest
+} else {
+	+MEmitForwardCopyPage .start , .size , .dest
+	+MEmitForwardCopyPageSmall .start , .size , .dest
+}
+}
+
+!set kUsed_MStartWithRts = 0
+!macro MStartWithRts .start {
+	!set kUsed_MStartWithRts = kUsed_MStartWithRts + 1
+	!by <StartWithRts
+	!word .start-1
+}
+
+!set kUsed_MSetAddr = 0
+!macro MSetAddr .val , .addr {
+	!set kUsed_MSetAddr = kUsed_MSetAddr + 1
+	!by <SetAddr
+	!word .addr
+	!by .val
+}

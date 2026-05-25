@@ -550,8 +550,8 @@ playerYPositionOffsetForLandscape
 .handPosY !by 0
 
 RenderHand
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch4_A
+	+MBus20To32Bit1_WriteMode_A
 
 	; Calculate a hand position
 	+TestForPortBitsLoop_A GameUsesPortA , JoystickBits_Left , .notHOLeft
@@ -805,8 +805,8 @@ PlayerReticle_lastXPos !by 0
 PlayerReticle_lastYPos !by 0
 
 RenderSpritePlayerReticle
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch4_A
+	+MBus20To32Bit1_WriteMode_A
 
 	; Precalc and store
 	lda playerXPositionOffset

@@ -40,14 +40,24 @@ if not exist bin\maincommon.prg goto error
 ..\ExternalTools\Gnu\bin\sed.exe -n -e "/^Bus20To32Bit1_/p" tmp\maincommon.map >>tmp\CommonBootDefines.a
 ..\ExternalTools\Gnu\bin\sed.exe -n -e "/^EndCommonBootCode/p" tmp\maincommon.map >>tmp\CommonBootDefines.a
 
+del bin\mainapu.prg
+..\acme.exe -v4 --lib ../ --lib ../../ --lib ../../../ --lib asm/ --msvc asm/main14APU.a
+if not exist bin\mainapu.prg goto error
+..\ExternalTools\Gnu\bin\sed.exe -n -e "/^APULineScrolls/p" tmp\mainapu.map >tmp\CommonAPUDefines.a
+..\ExternalTools\Gnu\bin\sed.exe -n -e "/^APUData_Start/p" tmp\mainapu.map >>tmp\CommonAPUDefines.a
+..\ExternalTools\Gnu\bin\sed.exe -n -e "/^kAPUNumRunwayRows/p" tmp\mainapu.map >>tmp\CommonAPUDefines.a
+..\ExternalTools\Gnu\bin\sed.exe -n -e "/^GameAPUInit/p" tmp\mainapu.map >>tmp\CommonAPUDefines.a
+..\ExternalTools\Gnu\bin\sed.exe -n -e "/^APUHiscoreOrRunwayFlag/p" tmp\mainapu.map >>tmp\CommonAPUDefines.a
+..\ExternalTools\Gnu\bin\sed.exe -n -e "/^APUHiscoreOrExitFlag/p" tmp\mainapu.map >>tmp\CommonAPUDefines.a
+..\ExternalTools\Gnu\bin\sed.exe -n -e "/^APUScoreTablePos/p" tmp\mainapu.map >>tmp\CommonAPUDefines.a
+..\ExternalTools\Gnu\bin\sed.exe -n -e "/^APUScoreTableTopSplitPos/p" tmp\mainapu.map >>tmp\CommonAPUDefines.a
+..\ExternalTools\Gnu\bin\sed.exe -n -e "/^APUData_VBlankYPos/p" tmp\mainapu.map >>tmp\CommonAPUDefines.a
+
 del bin\maintitle.prg
 ..\acme.exe -v4 --lib ../ --lib ../../ --lib ../../../ --lib asm/ --msvc asm/main14Title.a
 if not exist bin\maintitle.prg goto error
 ..\bin\LZMPi.exe -c64mr bin\maintitle.prg bin\maintitle.cmp.prg $200 >tmp\t.txt
 if not exist bin\maintitle.cmp.prg goto error
-..\ExternalTools\Gnu\bin\sed.exe -n -e "/^APULineScrolls/p" tmp\maintitle.map >tmp\CommonAPUDefines.a
-..\ExternalTools\Gnu\bin\sed.exe -n -e "/^APUData_Start/p" tmp\maintitle.map >>tmp\CommonAPUDefines.a
-..\ExternalTools\Gnu\bin\sed.exe -n -e "/^kAPUNumRunwayRows/p" tmp\maintitle.map >>tmp\CommonAPUDefines.a
 
 del bin\mainMissionComplete.prg
 ..\acme.exe -v4 --lib ../ --lib ../../ --lib ../../../ --lib asm/ --msvc asm/main14MissionComplete.a
@@ -82,7 +92,7 @@ if not exist bin\main.cmp.prg goto error
 echo *** Target = 2,097,152
 dir tmp\Demo14FileResources_ForHW*.bin tmp\Demo14FinalData.bin assets\Demo14\Audio\*.vcd
 
-goto skipCartData
+rem goto skipCartData
 rem Produce 8MB cartridge image, with first padding data for the file offsets
 del /q tmp\Demo14Cartridge.bin
 python ResourceGenerator\main.py tmp/Demo14Cartridge.bin 0
@@ -91,6 +101,7 @@ python ResourceGenerator\main.py tmp/Demo14Cartridge.bin addfile tmp\Demo14FileR
 python ResourceGenerator\main.py tmp/Demo14Cartridge.bin padding 0x1fff
 python ResourceGenerator\main.py tmp/Demo14Cartridge.bin addfile tmp\Demo14FinalData.bin tmp/Demo14CartridgeAddFile_2.a File2
 python ResourceGenerator\main.py tmp/Demo14Cartridge.bin padding 0x1fff
+rem ** Optional music files
 python ResourceGenerator\main.py tmp/Demo14Cartridge.bin addfile assets\Demo14\Audio\aburner_left.vcd tmp/Demo14CartridgeAddFile_l1.a FileL1
 python ResourceGenerator\main.py tmp/Demo14Cartridge.bin padding 0x1fff
 python ResourceGenerator\main.py tmp/Demo14Cartridge.bin addfile assets\Demo14\Audio\aburner_left3.vcd tmp/Demo14CartridgeAddFile_l3.a FileL3
@@ -105,7 +116,10 @@ python ResourceGenerator\main.py tmp/Demo14Cartridge.bin addfile assets\Demo14\A
 
 del bin\main.prg
 del bin\main.cmp2.prg
+rem ** Include optional music files
 ..\acme.exe -v4 --lib ../ --lib ../../ --lib ../../../ --lib asm/ --msvc tmp/Demo14CartridgeAddFile_1.a tmp/Demo14CartridgeAddFile_2.a tmp/Demo14CartridgeAddFile_l1.a tmp/Demo14CartridgeAddFile_l3.a tmp/Demo14CartridgeAddFile_l6.a tmp/Demo14CartridgeAddFile_r1.a tmp/Demo14CartridgeAddFile_r3.a tmp/Demo14CartridgeAddFile_r6.a asm/main14.a
+rem ** Skip optional music files
+rem ..\acme.exe -v4 --lib ../ --lib ../../ --lib ../../../ --lib asm/ --msvc tmp/Demo14CartridgeAddFile_1.a tmp/Demo14CartridgeAddFile_2.a asm/main14.a
 if not exist bin\main.prg goto error
 ..\bin\LZMPi.exe -c64mu bin\main.prg bin\main.cmp2.prg $200 >tmp\t.txt
 if not exist bin\main.cmp2.prg goto error

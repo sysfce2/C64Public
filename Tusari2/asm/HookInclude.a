@@ -12,7 +12,6 @@ kScore_IncludePanelUpdates = 1
 kAnimation_IncludeActivationObjectCode = 1
 
 !source "Animation_macros.a"
-!source "stdlib/LongBranches.a"
 
 !source "Animation.a"
 !source "UpdateSprites.a"

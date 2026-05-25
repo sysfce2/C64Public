@@ -16,8 +16,11 @@
 +M_CBM80
 
 .c64Reminder
-	!scr "MegaWang 2000 Turbo Edition hardware - Cart boot"
+	!scr "MegaWang 2000 Turbo Edition hardware"
 .c64ReminderEnd
+.c64Reminder2
+	!scr "Cart boot"
+.c64ReminderEnd2
 
 start
 	+MStopInitStack_X
@@ -31,27 +34,27 @@ DataToTopStartReal
 	sta ZPProcessorPort
 	lda #ProcessorPortDDRDefault
 	sta ZPProcessorPortDDR
-	lda #0
-	sta MemoryMappedIOArea1
-	sta MemoryMappedIOArea2
 
 	lda #ProcessorPortDefault
 	jsr InitialiseMachine
 
+	; Ensure the cartridge bank, although this should be 0,0 at power-on reset anyway
+	lda #0
+	sta MemoryMappedIOArea1
+	sta MemoryMappedIOArea2
+
 	+SetDefaultScreenLowerCase_A
 	+ClearScreenAt_AX SCREENRAM , ' '
+	+ClearScreenAt_AX COLOURRAM , VIC2Colour_Black
 	+DisplayColourTextMiddle_AX .c64Reminder , .c64ReminderEnd , SCREENRAM , VIC2Colour_White
+	+DisplayColourTextMiddle_AX .c64Reminder2 , .c64ReminderEnd2 , SCREENRAM + VIC2ScreenCharsWidth , VIC2Colour_LightGreen
 
-	+MWordValueToAddress_A BootCode , $fb
-	+MWordValueToAddress_A BASICSTART , $fd
-	ldy #0
-.cl1  lda ($fb),y
-	sta ($fd),y
-	+MIncAddr16 $fb , $fc
-	+MIncAddr16 $fd , $fe
-	lda $fc
-	cmp #(>BootCodeEnd)+1
-	bne .cl1
+	+MWordValueTo_XY BootCode
+	jsr MemoryCopy_SetSource
+	+MWordValueTo_XY BASICSTART
+	jsr MemoryCopy_SetDestination
+	+MWordValueTo_XY BootCodeEnd - BootCode
+	jsr MemoryCopy_ForSize
 
 	jmp 2061
 
@@ -59,10 +62,8 @@ Initialise_NoPreserveStack = 1
 Initialise_NoIRQServiceRoutine = 1
 Initialise_NoMACROWaitForTheLastScan = 1
 !source "stdlib/Initialise.a"
+!source "stdlib/MemoryCopy.a"
 
-BootCode
-!bin "bin/main.cmp2.prg",,2
-BootCodeEnd
 +MCheckNotInIOKernal
 DataToTopEndReal
 }
@@ -86,5 +87,10 @@ DoDataToTop
 	dex
 	bne .cl1
 	rts
+
+BootCode
+!bin "bin/main.cmp2.prg",,2
+BootCodeEnd
++MCheckNotInBASICUpwards
 
 +MCheckNotInKERNALServiceVectors

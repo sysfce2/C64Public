@@ -213,6 +213,15 @@ EntityUpdateObjects
 
 .enemyIndexForRender !by 0
 EntityRenderSpritesDirectMode
+	; Setup $100 - 1 in the add register. -1 because a read advances the address by 1
+	+MBus20To32Bit1_SetLatch8_A
+	+MBus20To32Bit1_WriteMode_A
+	+MBus24Bit_Send8BitValue $ff
+	+MBus20To32Bit1_UsingState_SetLatch9_A
+	+MBus24Bit_Send8BitValue 0
+	+MBus20To32Bit1_UsingState_SetLatch10_A
+	+MBus24Bit_Send8BitValue 0
+
 	; Render sorted entities
 	lda #SortHardMaxEntries-1
 	sta .enemyIndexForRender
@@ -231,8 +240,8 @@ EntityEnableRenderPlayerSpecialCase = *+1
 	+lbeq .skipEnemyDraw
 
 	; Player special case draw
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch4_A
+	+MBus20To32Bit1_WriteMode_A
 	jsr RenderSpritePlayer
 	lda GamePlayerExplode_ExplodeFrame
 	bne .skipEnemyDrawExploding
@@ -259,17 +268,11 @@ EntityEnableRenderPlayerSpecialCase = *+1
 
 	; Quick 3D position rotation test
 	; Combined transform
-	; Setup $100 - 1 in the add register. -1 because a read advances the address by 1
-	+MBus20To32Bit1_SetLatch8_A
-	+MBus24Bit_Send8BitValue $ff
-	+MBus20To32Bit1_UsingState_SetLatch9_A
-	+MBus24Bit_Send8BitValue 0
-	+MBus20To32Bit1_UsingState_SetLatch10_A
-	+MBus24Bit_Send8BitValue 0
 
 	; Set the rotation address
 	ldy landscapeRotationsFrame
-	+MBus20To32Bit1_UsingState_SetLatch1_A
+	+MBus20To32Bit1_SetLatch1_A
+	+MBus20To32Bit1_WriteMode_A
 	lda rotationVectorTableAddrs,y
 	+MBus24Bit_Send8BitValueFromA
 	+MBus20To32Bit1_UsingState_SetLatch2_A
@@ -294,11 +297,10 @@ EntityEnableRenderPlayerSpecialCase = *+1
 	sta zeroPage_Temp9
 }
 
-	+MBus20To32Bit1_WriteMode_A
-
 	; Set the rotation address
 	ldy landscapeRotationsFrame
 	+MBus20To32Bit1_UsingState_SetLatch1_A
+	+MBus20To32Bit1_WriteMode_A
 	lda rotationVectorTableAddrsNext,y
 	+MBus24Bit_Send8BitValueFromA
 	+MBus20To32Bit1_UsingState_SetLatch2_A
@@ -339,8 +341,8 @@ EntityEnableRenderPlayerSpecialCase = *+1
 	; Half perspective calculation
 	; Set the lookup address
 	; X
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_UsingState_SetLatch0_A
+	+MBus20To32Bit1_WriteMode_A
 	+MBus24Bit_Send8BitValueFromAddress zeroPage_Temp8
 	+MBus20To32Bit1_UsingState_SetLatch1_A
 	lda EntityZPos,x
@@ -357,8 +359,8 @@ EntityEnableRenderPlayerSpecialCase = *+1
 	sta EntityLastScreenXPos,x
 
 	; Y
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_UsingState_SetLatch0_A
+	+MBus20To32Bit1_WriteMode_A
 	+MBus24Bit_Send8BitValueFromAddress zeroPage_Temp9
 	; Get the perspective result
 	+MBus20To32Bit1_ReadMode_A
@@ -371,8 +373,8 @@ EntityEnableRenderPlayerSpecialCase = *+1
 
 
 	; Back to direct write
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_UsingState_SetLatch4_A
+	+MBus20To32Bit1_WriteMode_A
 
 	lda EntityTypeIsRotating,x
 	beq .notRotating
@@ -465,15 +467,13 @@ EntityEnableRenderPlayerSpecialCase = *+1
 .smEnemyJSR jsr $1234
 
 .skipEnemyDraw
-	+MBus20To32Bit1_WriteMode_A
-
 	dec .enemyIndexForRender
 	+lbpl .edl1
 
 
 	; Send data to the sprite hardware using direct mode
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch4_A
+	+MBus20To32Bit1_WriteMode_A
 
 	rts
 

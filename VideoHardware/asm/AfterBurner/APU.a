@@ -90,15 +90,14 @@ VBlankUpdateHorizon
 	sta zeroPage_Temp2
 
 	+MAdd24To24ToOut .horizonXOffset , .horizonXOffsetWork, .horizonXOffsetWork
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch4_A
+	+MBus20To32Bit1_WriteMode_A
 	+MBus24Bit_SendLE24BitValueFromAddress .horizonXOffsetWork
 
 	; yorg
 	+MBus24Bit_SendLE24BitValueFromAddress zeroPage_Temp0
 
 	; 24 bit mode, preserving the external address
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch7_A
 	+MBus24Bit_Send8BitValue kBus20To32Bit1_latch7_ResetDone
 }

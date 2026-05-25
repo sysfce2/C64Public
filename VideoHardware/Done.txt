@@ -2513,3 +2513,37 @@
 		>> Or maybe just include it early in main14.a or main14Title.a
 			To avoid the mission complete and intro screens having a slower transition
 	>> Hold down fire after the hardware test, during the cartridge to external RAM copy, until the test menu is displayed
+
+
+
+* Demo14: Better cart to RAM debug messages
+
+
+
+* Demo14: APU common setup during main14.a, save memory for main14Title.a etc
+
+
+
+* Demo14: Hiscore table scroll use APU
+	APUHiscoreOrRunwayFlag
+	APUHiscoreOrExitFlag
+	APUScoreTablePos*
+
+
+
+* Demo14: Verify external cart to RAM writes and retry, every bank.
+
+
+
+
+* Demo14: On C64U last debug print is 	+MDebugPrint $822
+	Which is between
+		; Addr, to the 24 bit interface
+		and
+		jsr Bus20To32Bit1_WriteMode
+	>>> If "external user port logic" is trying to assert values on $dd01 when it is set to output then the C64U hangs.
+	A normal C64 does not hang.
+	* Add emulation assert checks for the DDR being output, in write mode, when the interface might attempt output, a logic contention.
+	* Check for Bus20To32Bit1_WriteMode (includes the macro and the jsr)
+	>>> jsr Video_StartRasterTimers does modify the currently selected latch, hmm...
+	

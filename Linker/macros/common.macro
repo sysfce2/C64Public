@@ -1,0 +1,13 @@
+Given a Commodore 64
+  Given clear all external devices
+  Given a new C64 video display
+  And show C64 video window
+  And force C64 displayed bank to 3
+  Given I have a simple overclocked 6502 system
+  And I am using C64 processor port options
+  Given a ROM from file "C:\VICE\C64\kernal" at $$e000
+  Given a ROM from file "C:\VICE\C64\basic" at $$a000
+  Given a CHARGEN ROM from file "C:\VICE\C64\chargen"
+  Given add C64 hardware
+  And That does fail on BRK
+  And I enable uninitialised memory read protection with immediate fail

@@ -35,8 +35,8 @@ LandscapeRender_CommonTableCalculation
 	lda MultiplyByThree,y
 	+MAddAToAddr24 zeroPage_Temp0 , zeroPage_Temp1 , zeroPage_Temp2
 
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch0_A
+	+MBus20To32Bit1_WriteMode_A
 	+MBus24Bit_Send8BitValueFromAddress zeroPage_Temp0
 	+MBus20To32Bit1_UsingState_SetLatch1_A
 	+MBus24Bit_Send8BitValueFromAddress zeroPage_Temp1
@@ -51,10 +51,10 @@ LandscapeRender_CommonTableCalculation
 	sta zeroPage_Temp1
 	+MBus24Bit_Get8BitValueToA
 	sta zeroPage_Temp2
-	+MBus20To32Bit1_UsingState_WriteMode_A
 
 
 	+MBus20To32Bit1_UsingState_SetLatch0_A
+	+MBus20To32Bit1_UsingState_WriteMode_A
 	+MBus24Bit_Send8BitValueFromAddress zeroPage_Temp0
 	+MBus20To32Bit1_UsingState_SetLatch1_A
 	+MBus24Bit_Send8BitValueFromAddress zeroPage_Temp1
@@ -178,8 +178,8 @@ LandscapeRender
 	ora zeroPage_Temp3
 	sta zeroPage_Temp3
 .continueX
-	+MBus20To32Bit1_UsingState_WriteMode_A
 	+MBus20To32Bit1_UsingState_SetLatch4_A
+	+MBus20To32Bit1_UsingState_WriteMode_A
 
 .smj1	jmp $1234
 ObjectDrawReturn
@@ -192,8 +192,8 @@ ObjectDrawReturn
 	+lbne .dl1
 .endLandscapeDraw
 
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch4_A
+	+MBus20To32Bit1_WriteMode_A
 
 	rts
 

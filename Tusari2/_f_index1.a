@@ -199,7 +199,7 @@ CartFile1_XOR_spanned_3_Scroller1_cmp = $0
 ; bin\Scroller1.cmp
 CartFile1_Bank_spanned_4_Scroller1_cmp = $24
 CartFile1_Start_spanned_4_Scroller1_cmp = $8000
-CartFile1_Size_spanned_4_Scroller1_cmp = $104e
+CartFile1_Size_spanned_4_Scroller1_cmp = $1469
 CartFile1_XOR_spanned_4_Scroller1_cmp = $0
 
 ; bin\Scroller2.cmp

@@ -1,4 +1,4 @@
-; Start pos
+;; Start pos
 PlayerMapStartPositionXH = 0
 PlayerMapStartPositionYH = 0
 
@@ -18,6 +18,10 @@ PlayerMapStartPositionYH = 0
 ;PlayerMapStartPositionXH = 20
 ;PlayerMapStartPositionYH = 30
 
+; Top of caves
+;PlayerMapStartPositionXH = 83
+;PlayerMapStartPositionYH = 0
+
 
 PlayerScreenStartPositionX = 136
 PlayerScreenStartPositionY = 144
@@ -32,5 +36,5 @@ PlayerMapEndYH2	= 5
 PlayerMapEndLevel2 = 1
 
 
-kVerticalColoursSlots = 4
+kVerticalColoursSlots = 5
 kVerticalColoursNumPerSlot = 4

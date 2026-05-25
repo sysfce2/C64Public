@@ -255,8 +255,8 @@ RenderSpritesTitle
 
 
 .retryFrame
-	+MBus20To32Bit1_WriteMode_A
 	+MBus20To32Bit1_SetLatch0_A
+	+MBus20To32Bit1_WriteMode_A
 	+MBus24Bit_Send8BitValueFromAddress .animationFrameAddr
 	+MBus20To32Bit1_SetLatch1_A
 	+MBus24Bit_Send8BitValueFromAddress .animationFrameAddr+1
@@ -302,8 +302,8 @@ RenderSpritesTitle
 	+MBus24Bit_Get8BitValueToA
 	sta zeroPage_Temp7
 
-	+MBus20To32Bit1_UsingState_WriteMode_A
 	+MBus20To32Bit1_UsingState_SetLatch4_A
+	+MBus20To32Bit1_UsingState_WriteMode_A
 
 	lda zeroPage_Temp1
 	bne .otherBall
@@ -363,8 +363,8 @@ RenderSpritesTitle
 	+MBus24Bit_Get8BitValueToA
 	sta .animationFrameAddr+2
 
-	+MBus20To32Bit1_UsingState_WriteMode_A
-	+MBus20To32Bit1_UsingState_SetLatch4_A
+	+MBus20To32Bit1_SetLatch4_A
+	+MBus20To32Bit1_WriteMode_A
 
 !ifdef Debug_RenderTimeout {
 	jsr RenderTimeout2

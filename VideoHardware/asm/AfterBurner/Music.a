@@ -57,11 +57,14 @@ Music_GameChoiceNoChange
 	jmp Music_Play2
 }
 
+kAudio3SampleRate_25000Hz = 0x55C2
+kAudio3SampleRate_12500Hz = 0x2ae1
+;kAudio3SampleRate_12500Hz = 0x2ae1/2
 
 Music_Play2
 	jsr Audio2_Disable
-	+MAudio2_SetSample kAudio2_LeftChannel , kGameMusic2L_address , kGameMusic2L_length , kAudio2Register_Rate16_Normal/2
-	+MAudio2_SetSample kAudio2_RightChannel , kGameMusic2R_address , kGameMusic2R_length , kAudio2Register_Rate16_Normal/2
+	+MAudio2_SetSample kAudio2_LeftChannel , kGameMusic2L_address , kGameMusic2L_length , kAudio3SampleRate_12500Hz
+	+MAudio2_SetSample kAudio2_RightChannel , kGameMusic2R_address , kGameMusic2R_length , kAudio3SampleRate_12500Hz
 	lda #255
 	jsr Audio2_SetVolume
 	jsr Audio2_Enable
@@ -71,8 +74,8 @@ Music_Play2
 
 Music_Play3
 	jsr Audio2_Disable
-	+MAudio2_SetSample kAudio2_LeftChannel , kGameMusic3L_address , kGameMusic3L_length , kAudio2Register_Rate16_Normal/2
-	+MAudio2_SetSample kAudio2_RightChannel , kGameMusic3R_address , kGameMusic3R_length , kAudio2Register_Rate16_Normal/2
+	+MAudio2_SetSample kAudio2_LeftChannel , kGameMusic3L_address , kGameMusic3L_length , kAudio3SampleRate_12500Hz
+	+MAudio2_SetSample kAudio2_RightChannel , kGameMusic3R_address , kGameMusic3R_length , kAudio3SampleRate_12500Hz
 	lda #255
 	jsr Audio2_SetVolume
 	jsr Audio2_Enable
@@ -84,8 +87,8 @@ Music_Play3
 
 Music_Play6
 	jsr Audio2_Disable
-	+MAudio2_SetSample kAudio2_LeftChannel , kGameMusic6L_address , kGameMusic6L_length , kAudio2Register_Rate16_Normal/2
-	+MAudio2_SetSample kAudio2_RightChannel , kGameMusic6R_address , kGameMusic6R_length , kAudio2Register_Rate16_Normal/2
+	+MAudio2_SetSample kAudio2_LeftChannel , kGameMusic6L_address , kGameMusic6L_length , kAudio3SampleRate_12500Hz
+	+MAudio2_SetSample kAudio2_RightChannel , kGameMusic6R_address , kGameMusic6R_length , kAudio3SampleRate_12500Hz
 	lda #255
 	jsr Audio2_SetVolume
 	jsr Audio2_Enable

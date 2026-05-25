@@ -26,11 +26,29 @@ frameStart0
 	+MAPU kAPU_Incr_ADDRB1
 
 	; Load APULineScrolls
+	; For line scrolls
 	+MAPU kAPU_IDataRegLoad0
 	+MAPU kAPU_Incr_ADDRB1
 	+MAPU kAPU_IDataRegLoad1
 	+MAPU kAPU_Incr_ADDRB1
 	+MAPU kAPU_ADDRB2Load16
+
+	; Decide to run the runway or hiscore
+	+MAPU kAPU_IDataRegLoad2
+	+MAPU kAPU_Incr_ADDRB1
+	; APUHiscoreSections
+	+MAPU kAPU_IDataRegLoad0
+	+MAPU kAPU_Incr_ADDRB1
+	+MAPU kAPU_IDataRegLoad1
+	+MAPU kAPU_Incr_ADDRB1
+	+MAPU kAPU_IDataSelectReg2
+	+MAPU kAPU_PCLoad16 | kAPU_SkipIfEQ | kAPU_IDataSelectReg2
+	+MAPU
+
+	; Skip the hiscore data pointer
+	+MAPU kAPU_Incr_ADDRB1
+	+MAPU
+	+MAPU kAPU_Incr_ADDRB1
 
 	; Top of screen
 	+MAPU_LoadDoWait
@@ -58,6 +76,7 @@ frameStart0
 	; APULineScrolls
 	; Remaining lines
 APURunwayLoop
+	+MAPU
 	+MAPU_LoadDoWait
 
 	; Restore EADDRLo
@@ -67,9 +86,46 @@ APURunwayLoop
 	+MAPU kAPU_IDataSelectReg3SubReg4 | kAPU_IDataRegLoad3
 	+MAPU kAPU_IDataSelectReg3
 	+MAPU kAPU_PCLoad16 | kAPU_SkipIfEQ | kAPU_IDataSelectReg3
+	+MAPU
 
 	+MAPU kAPU_Reset_PC
 	+MAPU
+
+
+APUHiscoreSections
+	+MAPU
+
+	; Hiscore setup
+	; Load hiscore data pointer
+	+MAPU kAPU_IDataRegLoad0
+	+MAPU kAPU_Incr_ADDRB1
+	+MAPU kAPU_IDataRegLoad1
+	+MAPU kAPU_Incr_ADDRB1
+	+MAPU kAPU_ADDRB1Load16
+
+	; Decide to just exit the hiscore draw, for the title screen intro...
+	+MAPU kAPU_IDataRegLoad2
+	+MAPU kAPU_Incr_ADDRB1
+	+MAPU kAPU_IDataSelectReg2
+	; NOTE: APU: Real hardware: This fails, it always chooses reset even when reg2 is 0
+;	+MAPU kAPU_Reset_PC | kAPU_SkipIfEQ | kAPU_IDataSelectReg2
+	+MAPU
+
+	; Turn off the char screen
+	+MAPU_ProcessRasterByte
+	; Wait for the split position and enable the screen
+	+MAPU_LoadDoWait
+	+MAPU_ProcessRasterByte
+
+	; Hiscore sections
+!for .i , NumScoreTableEntries {
+	+MAPU_LoadDoWait
+	+MAPU_ProcessRasterWord
+}
+
+	+MAPU kAPU_Reset_PC
+	+MAPU
+
 }
 
 APUCode_Size = *-APUCode_Start
@@ -82,7 +138,9 @@ APUData_Start
 	!by kBus24Bit_Mode7Screen_EBBS
 
 	; Next RHRV to wait for, the start of the VBlank
-	+MAPU_EmitWait 0 , $f0
+APUData_VBlankYPos = * + 2
+APUData_VBlankYPos_Value = $f0
+	+MAPU_EmitWait 0 , APUData_VBlankYPos_Value
 	+MLittleEndian16Bit kBus24Bit_Mode7Screen_Registers
 APUData_Start_Mode7Registers
 	; dx
@@ -98,13 +156,22 @@ APUData_Start_Mode7Registers
 	; ypos
 	!by 0 , 0 , 0
 
-	; For line scrolls
+	; Get EBSEADDR values
 	!by $01
+	; For line scrolls
 	+MLittleEndian16Bit APULineScrolls - APUData_Start
+
+	; Decide to run the runway or hiscore
+APUHiscoreOrRunwayFlag
+	!by 0	; 0 = runway
+	!word APUHiscoreSections / kAPU_InstructionSize
+	; Load hiscore data pointer
+	; Skip the hiscore data pointer
+	!word APUHiscoreData - APUData_Start
 
 	; Top of screen
 	+MAPU_EmitWait kBus24Bit_VideoLayer_XPos_HSYNC_start - kMAPUEmitChangePaletteIndexHSyncAdjust , 12
-	; And reset the low kBus24Bit_TileScreen_ScrollY16
+	; And reset the kBus24Bit_TileScreen_ScrollY16
 	+MLittleEndian16Bit kBus24Bit_TileScreen_ScrollY16
 	!word -1
 
@@ -129,6 +196,32 @@ APULineScrolls
 ;	!word -((.i-1)+15) + (.i & $f) + $80	; Selects a pattern
 }
 
+APUHiscoreData
+
+APUHiscoreOrExitFlag
+	; Decide to just exit the hiscore draw, for the title screen intro...
+	!by 1	; 0 = Run the hiscore
+
+	; Turn off the char screen
+	!word kBus24Bit_VideoLayer_LayersEnable
+	!by kBus24Bit_VideoLayer_LayersEnable_134
+
+	; Wait for the split position and enable the screen
+APUScoreTableTopSplitPos = * + MAPU_EmitWait_offset_ypos
+	+MAPU_EmitWait kBus24Bit_VideoLayer_XPos_HSYNC_start , 15
+	!word kBus24Bit_VideoLayer_LayersEnable
+	!by kBus24Bit_VideoLayer_LayersEnable_1234
+
+APUScoreTablePosY1 = * + 2
+APUScoreTablePosX1 = * + 5
+APUScoreTablePos_size = 7
+	; Hiscore sections
+!for .i , NumScoreTableEntries {
+	+MAPU_EmitWait kBus24Bit_VideoLayer_XPos_HSYNC_start , 180 + .i
+	+MLittleEndian16Bit kBus24Bit_CharScreen_ScrollX16
+	+MLittleEndian16Bit -432 + (.i * 32)
+}
+
 APUData_End
 APUData_Size = APUData_End - APUData_Start
 
@@ -137,24 +230,3 @@ APUData_Size = APUData_End - APUData_Start
 }
 
 TotalAPU_Size = * - TotalAPU_Start
-
-
-SetupAPU
-	; Test for maths involved in processing the runway tables
-	jsr APU_SetAddressAPUInstructions
-	+MWordValueTo_AX APUCode_Start
-	ldy #<APUCode_Size
-	jsr Bus24Bit_CopySmallData
-!if >APUCode_Size > 0 {
-	ldx #>APUCode_Size
-	jsr Bus24Bit_CopySmallDataRepeatForX
-}
-	jsr APU_SetAddressAPUData
-	+MWordValueTo_AX APUData_Start
-	ldy #<APUData_Size
-	jsr Bus24Bit_CopySmallData
-!if >APUData_Size > 0 {
-	ldx #>APUData_Size
-	jsr Bus24Bit_CopySmallDataRepeatForX
-}
-	rts

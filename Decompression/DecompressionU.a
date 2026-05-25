@@ -62,9 +62,7 @@ RNXPCompressionDecompressU
 	lda	#-2
 	bcs	.copyToPageAddress
 
-	; Reset length and get new length
-	lda	#1
-	sta	RNXPCompressionDecompress_TempWord1 + 0
+	; ... and get new length
 
 	; Restore bit stream
 	txa

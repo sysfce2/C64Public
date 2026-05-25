@@ -1,0 +1,166 @@
+!source "stdlib/stdlib.a"
+!to "bin/Linker.prg", cbm
+!sal
+!sl "bin/Linker.map"
+!svl "bin/Linker.lbl"
+!pdb "bin/Linker.pdb"
+!cpu 6510
+!ct pet
+!initmem 0
+
+!source "stdlib\BASICEntry80d.a"
+
+!source "Linker\ChunkMacros.a"
+
+*=BASICEntry
+	sei
+	+MByteValueToAddress_A ProcessorPortAllRAM , ZPProcessorPort
+	+MCopyMemoryPageStartEndDest RelocStart , RelocEnd , RealStart
+	jmp RealStart
+
+ChunkData
+!source "_ChunkData.a"
+
+
+RelocStart
+!pseudopc ProcessorStack {
+RealStart
+	ldx #<Chunks-1	; Due to the stack being full descending
+	txs
+ProcessChunk
+	pla
+	sta .smj+1
+.smj	jmp ChunkCode
+
+Chunks
+!source "_Chunks.a"
+
+ChunkCode
+!if kUsed_MSetPP > 0 {
+!zn
+SetPP
+	pla
+	sta ZPProcessorPort
+	jmp ProcessChunk
+}
+
+!if kUsed_ForwardCopyPage > 0 {
+!zn
+ForwardCopyPage
+	pla
+	sta .sms1+1
+	pla
+	sta .sms1+2
+	pla
+	tay
+	pla
+	sta .smd1+1
+	pla
+	sta .smd1+2
+	ldx #0
+.sms1 lda $1234,x
+.smd1 sta $1234,x
+	inx
+	bne .sms1
+	inc .sms1+2
+	inc .smd1+2
+	dey
+	bne .sms1
+	jmp ProcessChunk
+}
+
+!if kUsed_ForwardCopySmall > 0 {
+!zn
+ForwardCopySmall
+	pla
+	sta .sms1+1
+	pla
+	sta .sms1+2
+	pla
+	sta .smc1+1
+	pla
+	sta .smd1+1
+	pla
+	sta .smd1+2
+	ldx #0
+.sms1 lda $1234,x
+.smd1 sta $1234,x
+	inx
+.smc1	cpx #0
+	bne .sms1
+	jmp ProcessChunk
+}
+
+
+
+!if kUsed_ReverseCopyPage > 0 {
+!zn
+ReverseCopyPage
+	pla
+	sta .sms1+1
+	pla
+	sta .sms1+2
+	pla
+	tay
+	pla
+	sta .smd1+1
+	pla
+	sta .smd1+2
+	ldx #$ff
+.sms1 lda $1234,x
+.smd1 sta $1234,x
+	dex
+	cpx #$ff
+	bne .sms1
+	dec .sms1+2
+	dec .smd1+2
+	dey
+	bne .sms1
+	jmp ProcessChunk
+}
+
+!if kUsed_ReverseCopySmall > 0 {
+!zn
+ReverseCopySmall
+	pla
+	sta .sms1+1
+	pla
+	sta .sms1+2
+	pla
+	tax
+	pla
+	sta .smd1+1
+	pla
+	sta .smd1+2
+.sms1 lda $1234,x
+.smd1 sta $1234,x
+	dex
+	bne .sms1	; Note: -1 based
+	jmp ProcessChunk
+}
+
+
+
+!if kUsed_MStartWithRts > 0 {
+StartWithRts
+	rts
+}
+
+!if kUsed_MSetAddr > 0 {
+!zn
+SetAddr
+	pla
+	sta .sm1+1
+	pla
+	sta .sm1+2
+	pla
+.sm1	sta $1234
+	jmp ProcessChunk
+}
+
+!if * >= $1ff {
+!error "There is too much data in the stack area"
+}
+}
+RelocEnd
+

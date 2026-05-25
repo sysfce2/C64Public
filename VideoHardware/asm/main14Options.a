@@ -10,7 +10,7 @@ SendResourceData = 1
 ;Debug_RunIntroScreenSequence = 7	; 1 is the first value
 ;Debug_GameStartZeroSpeed = 1
 ;Debug_SimpleLandscapeRotation = 1
-;Debug_NoSpawnEnemy=1
+;Debug_NoSpawnEnemy = 1
 ;Debug_Invulnerable = 1
 ;Debug_FakeHiscore = 1
 
@@ -18,13 +18,15 @@ Debug_RenderPreviousFramesPassed = 1
 ;Debug_RenderTimeout = 1
 
 ; Define this to enable faster CPU tweaks
-BuildForFasterCPU = 1
+;BuildForFasterCPU = 1
 
 TitleFramesTimeoutValue = 650
 ;TitleFramesTimeoutValue = 50	; Debug, much shorter
+;TitleFramesTimeoutValue = 5	; Debug, much shorter
 
 GameDemoExitTimeValue = 250
 ;GameDemoExitTimeValue = 30		; Debug, much shorter
+;GameDemoExitTimeValue = 3		; Debug, much shorter
 
 GameCompleteStageNumber = 26	; Just after the last river section, gives ten minutes of play at reasonable speed
 ;GameCompleteStageNumber = 2

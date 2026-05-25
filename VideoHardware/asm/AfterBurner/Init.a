@@ -30,24 +30,10 @@ OneTimeInit
 ;	+MBus24Bit_Send8BitValue 255
 
 	+MBus24Bit_SetAddress_A kBus24Bit_Sprites4_EBBS , kBus24Bit_Sprites4_Controls
-	; Flag
-	+MBus24Bit_Send8BitValue 2
-	; Border adjustments
-	+MBus24Bit_SendLE16BitValue -15
-	+MBus24Bit_SendLE16BitValue -16
-	; Extents
-	+MBus24Bit_Send8BitValue $a3
-	+MBus24Bit_Send8BitValue $70
+	jsr InitSprites4
 
 	+MBus24Bit_SetAddress_A kBus24Bit_Sprites4_EBBS , kBus24Bit_Sprites4_Controls2
-	; Flag
-	+MBus24Bit_Send8BitValue 2
-	; Border adjustments
-	+MBus24Bit_SendLE16BitValue -15
-	+MBus24Bit_SendLE16BitValue -16
-	; Extents
-	+MBus24Bit_Send8BitValue $a3
-	+MBus24Bit_Send8BitValue $70
+	jsr InitSprites4
 
 	jsr Video_SetAddressVideoLayersEnable
 	+MBus24Bit_Send8BitValue kBus24Bit_VideoLayer_LayersEnable_Default
@@ -60,3 +46,4 @@ OneTimeInit
 
 	rts
 
+!source "AfterBurner\InitSprites4.a"

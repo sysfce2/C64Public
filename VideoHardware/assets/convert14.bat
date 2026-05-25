@@ -143,6 +143,10 @@ java -jar ..\..\..\ImageToBitplane\target\imagetobitplane-1.0-SNAPSHOT-jar-with-
 
 rem Then produce the final optimised list again from the last conversion
 pushd ..
+rem Mostly TestMenu stuff
+del tmp\Demo14ScaledSprites4SheetOptimisedTestMenu.txtTables.a
+python ..\VideoHardware\OptimiseSprite4ScaleTables\main.py tmp\Demo14ScaledSprites4Sheet.txtTables.a tmp\Demo14ScaledSprites4SheetOptimisedTestMenu.txtTables.a tmp\Demo14ScaledSprites4SheetOptimised.txtTables.allowed.txt asm\AfterBurner\TestMenu.a
+
 rem Title first
 del tmp\Demo14ScaledSprites4SheetOptimisedTitle.txtTables.a
 python ..\VideoHardware\OptimiseSprite4ScaleTables\main.py tmp\Demo14ScaledSprites4Sheet.txtTables.a tmp\Demo14ScaledSprites4SheetOptimisedTitle.txtTables.a tmp\Demo14ScaledSprites4SheetOptimised.txtTables.allowed.txt asm\AfterBurner\*.a

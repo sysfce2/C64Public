@@ -52,6 +52,7 @@ start
 	sei
 	lda #ProcessorPortAllRAMWithIO
 	jsr InitialiseMachine
+	jsr Bus20To32Bit1_Init
 	jsr Bus24Bit_Init
 	jsr Bus20To32Bit1_Init
 	jsr APU_ResetDisableClear
@@ -198,8 +199,8 @@ start
 	jsr Bus20To32Bit1_SetLatch7
 	+MBus24Bit_Send8BitValue kBus20To32Bit1_latch7_ResetDone | kBus20To32Bit1_latch7_RAM | kBus20To32Bit1_latch7_InternalPA2
 	
-	jsr Bus20To32Bit1_ReadMode
 	jsr Bus20To32Bit1_SetLatch5
+	jsr Bus20To32Bit1_ReadMode
 	ldy #0
 	ldy #$80
 	ldx #0
@@ -460,10 +461,9 @@ InitGraphicsMemory
 
 !zn
 DMAHalfBank
-	jsr Bus20To32Bit1_WriteMode
 	jsr Bus20To32Bit1_SetLatch7
-	+MBus24Bit_Send8BitValue kBus20To32Bit1_latch7_ResetDone | kBus20To32Bit1_latch7_RAM | kBus20To32Bit1_latch7_InternalPA2
 	jsr Bus20To32Bit1_WriteMode
+	+MBus24Bit_Send8BitValue kBus20To32Bit1_latch7_ResetDone | kBus20To32Bit1_latch7_RAM | kBus20To32Bit1_latch7_InternalPA2
 	jsr Bus20To32Bit1_SetLatch11
 	+MBus24Bit_Send8BitValue $ff
 	jsr Bus20To32Bit1_SetLatch12

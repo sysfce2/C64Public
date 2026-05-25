@@ -475,6 +475,7 @@ VIC2MemorySetup					= $d018
 VIC2MemorySetup_BitmapSize		= $2000
 VIC2MemorySetup_CharsSize		= $800
 VIC2MemorySetup_ScreenSize		= $400
+VIC2MemorySetup_ScreenSizeMask	= VIC2MemorySetup_ScreenSize-1
 VIC2MemorySetup_SpriteSize		= $40
 }
 
@@ -769,6 +770,18 @@ CIA1PortADDR					= $dc02
 
 ; Each enabled bit sets read and write on CIA1KeyboardRowsJoystickB otherwise the value can just be read.
 CIA1PortBDDR					= $dc03
+
+!macro MInitKeyboardCheckForRunStop .notRunstop {
+	lda #$ff
+	sta CIA1PortADDR
+	lda #0
+	sta CIA1PortBDDR
+	lda #$7f
+	sta CIA1KeyboardColumnJoystickA
+;	lda #$7f	; Not needed
+	cmp CIA1KeyboardRowsJoystickB
+	bne .notRunstop
+}
 
 CIA1TimerALo					= $dc04
 CIA1TimerAHi					= $dc05
@@ -1125,6 +1138,15 @@ RasterLengthNTSCC64		= 520
 	bne .dm1
 }
 
+!macro MCopyMemoryPageStartEndDest .addrStart , .endExclusive , .dest {
+	ldx #.endExclusive-.addrStart
+.dm1
+	lda .addrStart-1,x
+	sta+2 .dest-1,x
+	dex
+	bne .dm1
+}
+
 !macro MCopyMemorySlowOnceFromToLength_A .from , .to , .length {
 .i1	lda .from
 .i2	sta .to
@@ -1244,6 +1266,16 @@ RasterLengthNTSCC64		= 520
 	lda CIA1KeyboardColumnJoystickA
 	and #JoystickBits_Fire
 	bne .to
+.ft2
+	lda CIA1KeyboardColumnJoystickA
+	and #JoystickBits_Fire
+	beq .ft2
+}
+
+!macro LWaitForFireALoop_A .to {
+	lda CIA1KeyboardColumnJoystickA
+	and #JoystickBits_Fire
+	+lbne .to
 .ft2
 	lda CIA1KeyboardColumnJoystickA
 	and #JoystickBits_Fire
@@ -1470,6 +1502,10 @@ RasterLengthNTSCC64		= 520
 	sta .addr
 }
 
+!macro MAToAddress_A .addr {
+	+MAlsoToAddress_A .addr
+}
+
 !macro MWordValueToAddress_A .value , .addr {
 	lda #<.value
 	sta .addr
@@ -1656,6 +1692,18 @@ RasterLengthNTSCC64		= 520
 	dec .word+1
 .o1
 	dec .word
+}
+
+!macro MDecAddr24_A .addr {
+	lda .addr
+	bne .o1
+	lda .addr+1
+	bne .o2
+	dec .addr+2
+.o2
+	dec .addr+1
+.o1
+	dec .addr
 }
 
 !macro MPushAddr8_A .addr {
@@ -1956,6 +2004,12 @@ RasterLengthNTSCC64		= 520
 !macro MCheckNotInKERNALServiceVectors {
 !if * >= KERNALNMIServiceRoutineLo {
 	!error "Code/data within KERNAL Service vectors"
+}
+}
+
+!macro MCheckNotInBASICUpwards {
+!if * >= BASICROM {
+	!error "Code/data within BASIC upwards"
 }
 }
 

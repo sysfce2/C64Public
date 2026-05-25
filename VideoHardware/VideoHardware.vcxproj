@@ -409,6 +409,7 @@
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\BombJack\stdlib\APU.a" />
+    <Library Include="..\..\BombJack\stdlib\APUSetup.a" />
     <Library Include="..\..\BombJack\stdlib\APU_Macros.a" />
     <Library Include="..\..\BombJack\stdlib\Audio.a" />
     <Library Include="..\..\BombJack\stdlib\Bus20To32Bit1.a" />
@@ -491,6 +492,7 @@
     <Library Include="asm\AfterBurner\GamePlayerExplode2.a" />
     <Library Include="asm\AfterBurner\GameRefueling.a" />
     <Library Include="asm\AfterBurner\Init.a" />
+    <Library Include="asm\AfterBurner\InitSprites4.a" />
     <Library Include="asm\AfterBurner\IntroScreens.a" />
     <Library Include="asm\AfterBurner\Landscape.a" />
     <Library Include="asm\AfterBurner\LandscapeAnimate.a" />
@@ -545,6 +547,7 @@
     <Library Include="asm\main12.a" />
     <Library Include="asm\main13.a" />
     <Library Include="asm\main14.a" />
+    <Library Include="asm\main14APU.a" />
     <Library Include="asm\main14Cart.a" />
     <Library Include="asm\main14Common.a" />
     <Library Include="asm\main14Game.a" />
