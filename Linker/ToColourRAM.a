@@ -1,0 +1,14 @@
+ColourRAMCopy
++MCopyMemorySlowOnceFromToLength_A TempData, COLOURRAM, ColourLength
+rts
+
+*=$fc00
+TempData
+!bin "../CharPack/colours.bin"
+ColourLength = *-TempData
+
+*=VIC2_Bank3 + VIC2MemorySetup_CharsSize
+!bin "../CharPack/screen.bin"
+
+*=VIC2_Bank3
+!bin "../CharPack/chars.bin"

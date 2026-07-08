@@ -67,9 +67,12 @@
     <None Include="ChunkData.a" />
     <None Include="ChunkMacros.a" />
     <None Include="Chunks.a" />
+    <None Include="DisplayScreen.a" />
     <None Include="FeatureEditor.bat" />
     <None Include="features\TestOutput.feature" />
     <None Include="Linker.a" />
+    <None Include="ToColourRAM.a" />
+    <None Include="ToColourRAMDef.a" />
     <None Include="_ChunkData.a" />
     <None Include="_Chunks.a" />
   </ItemGroup>

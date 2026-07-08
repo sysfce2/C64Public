@@ -1,0 +1,32 @@
+!source "stdlib/stdlib.a"
+!to "bin/DisplayScreen.prg", cbm
+!sal
+!sl "bin/DisplayScreen.map"
+!svl "bin/DisplayScreen.lbl"
+!pdb "bin/DisplayScreen.pdb"
+!cpu 6510
+!ct pet
+!initmem 0
+
+* = $800
+Code
+	+MStopInitStack_X
+
+; For an example without the linker, the DoColourRAMCopy define will include all the data in a single file. This needs to execute ColourRAMCopy to copy from under the kernal to COLOURRAM.
+!ifdef DoColourRAMCopy {
+	jsr ColourRAMCopy
+}
+
+	+MVIC2MemorySetup_ScreenChar_A VIC2_Bank3 + VIC2MemorySetup_CharsSize , VIC2_Bank3
+	+MAToAddress_A  VIC2MemorySetup
+	+MByteValueToAddress_A CIA2PortASerialBusVICBank_Bank3 , CIA2PortASerialBusVICBank
+	+MByteValueToAddress_A VIC2ScreenControlHDefault | kVIC2ScreenControlHBits_Multicolour, VIC2ScreenControlH
+
+	+MByteValueToAddress_A VIC2Colour_LightBlue , VIC2ScreenColour
+	+MByteValueToAddress_A VIC2Colour_DarkGrey , VIC2ExtraBackgroundColour1
+	+MByteValueToAddress_A VIC2Colour_Grey , VIC2ExtraBackgroundColour2
+
+	+MByteValueToAddress_A VIC2ScreenControlVDefault , VIC2ScreenControlV
+
+.l1	inc VIC2BorderColour
+	jmp .l1

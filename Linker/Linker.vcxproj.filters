@@ -19,6 +19,9 @@
     <Filter Include="features">
       <UniqueIdentifier>{fbf7f2c6-ce43-45ea-b0a4-861aec1d5dba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Examples">
+      <UniqueIdentifier>{dfda941a-0097-49aa-bf20-ef01f8fed2f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
@@ -98,13 +101,7 @@
     <None Include="..\stdlib\VideoModes_Macros.a">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="ChunkData.a">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="Chunks.a">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="ChunkMacros.a">
       <Filter>Source Files</Filter>
     </None>
     <None Include="BuildIt.bat">
@@ -130,6 +127,21 @@
     </None>
     <None Include="FeatureEditor.bat">
       <Filter>Source Files</Filter>
+    </None>
+    <None Include="DisplayScreen.a">
+      <Filter>Source Files\Examples</Filter>
+    </None>
+    <None Include="ChunkData.a">
+      <Filter>Source Files\Examples</Filter>
+    </None>
+    <None Include="ChunkMacros.a">
+      <Filter>Source Files\Examples</Filter>
+    </None>
+    <None Include="ToColourRAM.a">
+      <Filter>Source Files\Examples</Filter>
+    </None>
+    <None Include="ToColourRAMDef.a">
+      <Filter>Source Files\Examples</Filter>
     </None>
   </ItemGroup>
 </Project>

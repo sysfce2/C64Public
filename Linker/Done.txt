@@ -9,3 +9,17 @@
 
 
 * Tests
+
+
+
+* Utility to create/modify chunks
+	python Linker.py -pp ProcessorPortDefault -b COLOURRAM ../CharPack/colours.bin -sa VIC2BorderColour VIC2Colour_White -b $800 bin\DisplayScreen.prg 2 -b "VIC2_Bank3 + VIC2MemorySetup_CharsSize" ../CharPack/screen.bin -b VIC2_Bank3 ../CharPack/chars.bin -pp ProcessorPortAllRAMWithIO -sr $800
+
+
+
+* Compare with single file and compress approach:
+	..\acme.exe --lib ..\ -v4 --msvc ToColourRAMDef.a DisplayScreen.a ToColourRAM.a
+	..\bin\LZMPi.exe -pp $35 -c64mbu bin\DisplayScreen.prg bin\DisplayScreen.cmp.prg $800
+	Using Vice monitor sw command...
+	Linker.cmp.prg = 214876
+	DisplayScreen.cmp.prg = 1146558
