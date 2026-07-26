@@ -100,13 +100,13 @@ ConwayStep
 	lda (ZPUnused0),y
 	cmp #kWillDie
 	bne .notWillDie
-	lda #' '
+	lda #kEmptyCell
 	sta (ZPUnused0),y
 	bne .continuePostProcess
 .notWillDie
 	cmp #kWillSpawn
 	bne .continuePostProcess
-	lda #kReverseSpace
+	lda #kAliveCell1
 	sta (ZPUnused0),y
 
 .continuePostProcess

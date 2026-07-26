@@ -13,15 +13,17 @@
 !source "stdlib/LongBranches.a"
 
 ; All neagtive chars values are currently "alive" for this step
-kReverseSpace = $a0
+kAliveCell1 = $a0
 kWillDie = $ff
 ; All positive chars values are currently "empty" for this step
-kWillSpawn = $01
+kWillSpawn = $02
+kEmptyCell = $00
 
 ; zeropage variables used by ConwayRules.a
 tempY = ZPUnused2
 tempX = ZPUnused3
 currentCellYReg = ZPRNDSeed0
+CHARS = $3800
 
 *=$800
 	sei
@@ -47,15 +49,19 @@ currentCellYReg = ZPRNDSeed0
 	+DisplayColourTextAt_AX InstructionsText3 , InstructionsText3End , SCREENRAM + (4 * VIC2ScreenCharsWidth) + 1 , VIC2Colour_Yellow
 	+DisplayColourTextAt_AX InstructionsText4 , InstructionsText4End , SCREENRAM + (5 * VIC2ScreenCharsWidth) + 1 , VIC2Colour_Yellow
 	+DisplayColourTextAt_AX InstructionsText5 , InstructionsText5End , SCREENRAM + (6 * VIC2ScreenCharsWidth) + 1 , VIC2Colour_Yellow
+	+DisplayColourTextAt_AX InstructionsText6 , InstructionsText6End , SCREENRAM + (7 * VIC2ScreenCharsWidth) + 1 , VIC2Colour_Yellow
 
 	cli	; Let SCNKEY run in the default IRQ
 .wait
 	jsr GETIN
 	beq .wait
 
-	jsr CLRSCR
+	+MVIC2MemorySetup_ScreenChar_A SCREENRAM , CHARS
+	+MAToAddress_A VIC2MemorySetup
+
+	jsr .keyClear
 	; Show a default Glider shape
-	+MByteValueToAddress_A kReverseSpace , SCREENRAM + (10 * VIC2ScreenCharsWidth) + 20
+	+MByteValueToAddress_A kAliveCell1 , SCREENRAM + (10 * VIC2ScreenCharsWidth) + 20
 	+MAlsoToAddress_A SCREENRAM + (11 * VIC2ScreenCharsWidth) + 21
 	+MAlsoToAddress_A SCREENRAM + (12 * VIC2ScreenCharsWidth) + 19
 	+MAlsoToAddress_A SCREENRAM + (12 * VIC2ScreenCharsWidth) + 20
@@ -85,6 +91,8 @@ ProcessKey
 	+lbeq .keyStep
 	cmp #'c'
 	+lbeq .keyClear
+	cmp #'g'
+	+lbeq .keyGridLines
 	rts
 
 PosX !by 0
@@ -133,7 +141,28 @@ PosY !by 0
 	rts
 
 .keyClear
-	jmp CLRSCR
+	+ClearScreenAt_AX SCREENRAM , kEmptyCell
+	+ClearScreenAt_AX COLOURRAM , VIC2Colour_LightBlue
+	rts
+
+.keyGridLines
+	ldx #VIC2CharByteSize-1
+	lda CHARS + (kEmptyCell * VIC2CharByteSize)
+	beq .copyGrid
+	lda #0
+.cll1
+	sta CHARS + (kEmptyCell * VIC2CharByteSize),x
+	dex
+	bpl .cll1
+	rts
+.copyGrid
+.cll2
+	lda GridLines,x
+	sta CHARS + (kEmptyCell * VIC2CharByteSize),x
+	dex
+	bpl .cll2
+	rts
+
 
 ScrPosForYLo
 ScrPosForYHi = * + VIC2ScreenCharsHeight
@@ -151,11 +180,11 @@ ScrPosForYHi = * + VIC2ScreenCharsHeight
 	ldy PosX
 	lda (ZPUnused0),y
 	bmi .isFilled
-	lda #kReverseSpace
+	lda #kAliveCell1
 	sta (ZPUnused0),y
 	rts
 .isFilled
-	lda #$20	; Space
+	lda #kEmptyCell
 	sta (ZPUnused0),y
 	rts
 
@@ -231,3 +260,54 @@ InstructionsText4End
 InstructionsText5
 	!scr "C will clear the screen"
 InstructionsText5End
+InstructionsText6
+	!scr "G will toggle grid lines"
+InstructionsText6End
+
+GridLines
++CharLine %#.......
++CharLine %........
++CharLine %#.......
++CharLine %........
++CharLine %#.......
++CharLine %........
++CharLine %#.......
++CharLine %.#.#.#.#
+
+
+* = CHARS + (kEmptyCell * VIC2CharByteSize)
++CharLine %........
++CharLine %........
++CharLine %........
++CharLine %........
++CharLine %........
++CharLine %........
++CharLine %........
++CharLine %........
+* = CHARS + (kWillSpawn * VIC2CharByteSize)
++CharLine %........
++CharLine %........
++CharLine %........
++CharLine %...#....
++CharLine %....#...
++CharLine %........
++CharLine %........
++CharLine %........
+* = CHARS + (kAliveCell1 * VIC2CharByteSize)
++CharLine %..####..
++CharLine %.######.
++CharLine %########
++CharLine %########
++CharLine %########
++CharLine %########
++CharLine %.######.
++CharLine %..####..
+* = CHARS + (kWillDie * VIC2CharByteSize)
++CharLine %..####..
++CharLine %..####..
++CharLine %##.##.##
++CharLine %###..#..
++CharLine %..##.###
++CharLine %###.#.##
++CharLine %.#.###..
++CharLine %..####..

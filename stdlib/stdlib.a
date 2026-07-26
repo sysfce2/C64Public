@@ -598,6 +598,7 @@ VIC2SpriteSizeY = 21
 }
 
 VIC2SpriteByteSize = 3 * 21
+VIC2CharByteSize = 8
 
 ; The left most position for a 40 column wide screen where the sprite is completely visible
 VIC2SpriteXBorderLeft = 24
@@ -1421,6 +1422,9 @@ RasterLengthNTSCC64		= 520
 
 !macro SpriteLine .v {
 	!by .v>>16, (.v>>8)&255, .v&255
+}
+!macro CharLine .v {
+	!by .v
 }
 
 !macro MACRODelay_X .time {
