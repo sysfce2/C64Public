@@ -1,0 +1,233 @@
+!to "Conway.prg", cbm
+!sl "tmp/Conway.map"
+!sal
+!svl "tmp/Conway.lbl"
+!pdb "tmp/Conway.pdb"
+!cpu 6510
+!ct pet
+!initmem $aa
+
+!source "stdlib/stdlib.a"
+!source "stdlib/PETSCII.a"
+!source "stdlib/Comparisons.a"
+!source "stdlib/LongBranches.a"
+
+; All neagtive chars values are currently "alive" for this step
+kReverseSpace = $a0
+kWillDie = $ff
+; All positive chars values are currently "empty" for this step
+kWillSpawn = $01
+
+; zeropage variables used by ConwayRules.a
+tempY = ZPUnused2
+tempX = ZPUnused3
+currentCellYReg = ZPRNDSeed0
+
+*=$800
+	sei
+	lda #ProcessorPortDefault
+	jsr InitialiseMachine
+
+	; Init kernal
+	+M_RAMTAS
+	+InitKERNALIO_AXY
+	jsr CINT
+
+	+SetDefaultScreenLowerCase_A
+
+	+MACRODisableUpperLowerCaseChange_A
+	+MByteValueToAddress_A $ff , EZPFlagFlagRepeatKeys
+
+	+MVIC2SpriteIndex_A SpriteBorder
+	+MAToAddress_A SPRITEFRAME
+	+MByteValueToAddress_A %1 , VIC2SpriteEnable
+
+	+DisplayColourTextMiddle_AX InstructionsText1 , InstructionsText1End , SCREENRAM + (1 * VIC2ScreenCharsWidth) , VIC2Colour_White
+	+DisplayColourTextAt_AX InstructionsText2 , InstructionsText2End , SCREENRAM + (3 * VIC2ScreenCharsWidth) + 1 , VIC2Colour_Yellow
+	+DisplayColourTextAt_AX InstructionsText3 , InstructionsText3End , SCREENRAM + (4 * VIC2ScreenCharsWidth) + 1 , VIC2Colour_Yellow
+	+DisplayColourTextAt_AX InstructionsText4 , InstructionsText4End , SCREENRAM + (5 * VIC2ScreenCharsWidth) + 1 , VIC2Colour_Yellow
+	+DisplayColourTextAt_AX InstructionsText5 , InstructionsText5End , SCREENRAM + (6 * VIC2ScreenCharsWidth) + 1 , VIC2Colour_Yellow
+
+	cli	; Let SCNKEY run in the default IRQ
+.wait
+	jsr GETIN
+	beq .wait
+
+	jsr CLRSCR
+	; Show a default Glider shape
+	+MByteValueToAddress_A kReverseSpace , SCREENRAM + (10 * VIC2ScreenCharsWidth) + 20
+	+MAlsoToAddress_A SCREENRAM + (11 * VIC2ScreenCharsWidth) + 21
+	+MAlsoToAddress_A SCREENRAM + (12 * VIC2ScreenCharsWidth) + 19
+	+MAlsoToAddress_A SCREENRAM + (12 * VIC2ScreenCharsWidth) + 20
+	+MAlsoToAddress_A SCREENRAM + (12 * VIC2ScreenCharsWidth) + 21
+
+.l1
+	inc VIC2Sprite0Colour
+	jsr GETIN
+	beq .noKey
+	jsr ProcessKey
+.noKey
+	jsr UpdateSpritePosition
+	jmp .l1
+
+ProcessKey
+	cmp #CHR_Left
+	+lbeq .keyLeft
+	cmp #CHR_Right
+	+lbeq .keyRight
+	cmp #CHR_Up
+	+lbeq .keyUp
+	cmp #CHR_Down
+	+lbeq .keyDown
+	cmp #' '
+	+lbeq .keySpace
+	cmp #'s'
+	+lbeq .keyStep
+	cmp #'c'
+	+lbeq .keyClear
+	rts
+
+PosX !by 0
+PosY !by 0
+
+.keyLeft
+	dec PosX
+	lda PosX
+	bmi .isNegX
+	rts
+.isNegX
+	lda #VIC2ScreenCharsWidth-1
+	sta PosX
+	rts
+
+.keyRight
+	inc PosX
+	lda PosX
+	cmp #VIC2ScreenCharsWidth
+	+IfRegGreaterThanOrEqualToVal .isGEX
+	rts
+.isGEX
+	lda #0
+	sta PosX
+	rts
+
+.keyUp
+	dec PosY
+	lda PosY
+	bmi .isNegY
+	rts
+.isNegY
+	lda #VIC2ScreenCharsHeight-1
+	sta PosY
+	rts
+
+.keyDown
+	inc PosY
+	lda PosY
+	cmp #VIC2ScreenCharsHeight
+	+IfRegGreaterThanOrEqualToVal .isGEY
+	rts
+.isGEY
+	lda #0
+	sta PosY
+	rts
+
+.keyClear
+	jmp CLRSCR
+
+ScrPosForYLo
+ScrPosForYHi = * + VIC2ScreenCharsHeight
+!for .i , VIC2ScreenCharsHeight {
+	!word SCREENRAM + ((.i-1) * VIC2ScreenCharsWidth)
+}
+!swizzle ScrPosForYLo , VIC2ScreenCharsHeight , 2
+
+.keySpace
+	ldx PosY
+	lda ScrPosForYLo,x
+	sta ZPUnused0
+	lda ScrPosForYHi,x
+	sta ZPUnused1
+	ldy PosX
+	lda (ZPUnused0),y
+	bmi .isFilled
+	lda #kReverseSpace
+	sta (ZPUnused0),y
+	rts
+.isFilled
+	lda #$20	; Space
+	sta (ZPUnused0),y
+	rts
+
+
+.keyStep
+	jsr ConwayStep
+	rts
+
+.sprPosForXLo
+.sprPosForXHi = * + VIC2ScreenCharsWidth
+!for .i , VIC2ScreenCharsWidth {
+	!word VIC2SpriteXBorderLeft + ((.i-1) * VIC2CharsHiresPixelsX)
+}
+!swizzle .sprPosForXLo , VIC2ScreenCharsWidth , 2
+
+.sprPosForY
+!for .i , VIC2ScreenCharsHeight {
+	!by VIC2SpriteYBorderTop + ((.i-1) * VIC2CharsHiresPixelsY)
+}
+
+UpdateSpritePosition
+	ldx PosX
+	lda .sprPosForXLo,x
+	sta VIC2Sprite0X
+	lda .sprPosForXHi,x
+	sta VIC2SpriteXMSB
+	ldx PosY
+	lda .sprPosForY,x
+	sta VIC2Sprite0Y
+	rts
+
+!source "tmp/FingerPrint.a"
+!source "stdlib/Initialise.a"
+
+!align VIC2MemorySetup_SpriteSize-1,0
+SpriteBorder
++SpriteLine %########................
++SpriteLine %#......#................
++SpriteLine %#......#................
++SpriteLine %#......#................
++SpriteLine %#......#................
++SpriteLine %#......#................
++SpriteLine %#......#................
++SpriteLine %########................
++SpriteLine %........................
++SpriteLine %........................
++SpriteLine %........................
++SpriteLine %........................
++SpriteLine %........................
++SpriteLine %........................
++SpriteLine %........................
++SpriteLine %........................
++SpriteLine %........................
++SpriteLine %........................
++SpriteLine %........................
++SpriteLine %........................
++SpriteLine %........................
+
+!source "ConwayRules.a"
+
+InstructionsText1
+	!scr "Conway's Game of Life"
+InstructionsText1End
+InstructionsText2
+	!scr "Move the cursor with the cursor keys"
+InstructionsText2End
+InstructionsText3
+	!scr "Space will toggle a pixel"
+InstructionsText3End
+InstructionsText4
+	!scr "S will step a frame"
+InstructionsText4End
+InstructionsText5
+	!scr "C will step a frame"
+InstructionsText5End

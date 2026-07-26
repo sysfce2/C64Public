@@ -1,0 +1,127 @@
+!zn
+; https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life#Rules
+ConwayStep
+	; First calculate what will happen based on current contents
+	+MByteValueToAddress_A 0 , tempY
+
+.ly1
+	+MByteValueToAddress_A 0 , tempX
+
+	ldx tempY
+	lda ScrPosForYLo,x
+	sta ZPUnused0
+	lda ScrPosForYHi,x
+	sta ZPUnused1
+	
+.lx1
+	; Use the Y register to quickly address all 3x3 cells.
+	; This means the current cell is actually tempX+1, tempY+1
+	; This means the edges of the grid are "dead zones"
+	ldx #0	; Count of cells alive
+!macro MTestCellIntoX {
+	lda (ZPUnused0),y
+	bpl .isDead
+	inx
+.isDead
+}
+
+	; Count alive cells around this cell position
+	ldy tempX
+	+MTestCellIntoX
+	iny
+	+MTestCellIntoX
+	iny
+	+MTestCellIntoX
+
+	lda tempX
+	clc
+	adc #VIC2ScreenCharsWidth
+	tay
+	+MTestCellIntoX
+	iny
+	; Skip ourselves
+	sty currentCellYReg
+	iny
+	+MTestCellIntoX
+
+	lda tempX
+	clc
+	adc #VIC2ScreenCharsWidth*2
+	tay
+	+MTestCellIntoX
+	iny
+	+MTestCellIntoX
+	iny
+	+MTestCellIntoX
+
+	; Process rules for this cell
+	ldy currentCellYReg
+	lda (ZPUnused0),y
+	bmi .isCurrentlyAlive
+
+	; Is currently empty i.e. "dead"
+	cpx #3
+	bne .testCellLoopContinue
+	lda #kWillSpawn
+	sta (ZPUnused0),y
+	jmp .testCellLoopContinue
+
+.isCurrentlyAlive
+	cpx #2
+	+IfRegLessThanVal .willDie
+	cpx #4
+	+IfRegGreaterThanOrEqualToVal .willDie
+
+.testCellLoopContinue
+	inc tempX
+	lda tempX
+	cmp #VIC2ScreenCharsWidth-2
+	bne .lx1
+
+	inc tempY
+	lda tempY
+	cmp #VIC2ScreenCharsHeight-2
+	bne .ly1
+
+
+	; Now update the will die and will spawn cells
+	+MByteValueToAddress_A 0 , tempY
+
+.ly2
+	ldx tempY
+	lda ScrPosForYLo,x
+	sta ZPUnused0
+	lda ScrPosForYHi,x
+	sta ZPUnused1
+
+	ldy #VIC2ScreenCharsWidth-1
+.lx2
+	; Count alive cells around this cell position
+	lda (ZPUnused0),y
+	cmp #kWillDie
+	bne .notWillDie
+	lda #' '
+	sta (ZPUnused0),y
+	bne .continuePostProcess
+.notWillDie
+	cmp #kWillSpawn
+	bne .continuePostProcess
+	lda #kReverseSpace
+	sta (ZPUnused0),y
+
+.continuePostProcess
+	dey
+	bpl .lx2
+
+	inc tempY
+	lda tempY
+	cmp #VIC2ScreenCharsHeight-1
+	bne .ly2
+
+
+	rts
+
+.willDie
+	lda #kWillDie
+	sta (ZPUnused0),y
+	jmp .testCellLoopContinue

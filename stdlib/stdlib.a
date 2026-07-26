@@ -169,6 +169,7 @@ ProcessorStack					= $0100		; $0100 - $01ff
 EZPCurrentCharColourCode		= $0286		; Uses: VIC2Colour_*
 EZPStringDisplayHiAddress		= $0288		; See: InitKERNALStringDisplay_AXY
 EZPFlagFlagRepeatKeys			= $028a		; 0 = no repeat (default). $ff = repeat all.
+EZPFlagShiftKeys				= $028d		; Shift key status from SCNKEY
 EZPFlagUpperLowerCaseChange		= $0291		; $80 = Keyboard or chr$(8) does not change upper/lower case
 EZPFlagAutoScrollDown			= $0292		; 0 = No auto scroll
 EZPFlagTempIRQDuringTapeIOLoHi	= $029f
@@ -582,6 +583,8 @@ VIC2Multicolour_Blue	= 14
 VIC2Multicolour_Yellow	= 15
 
 ; Other constant values related to the VIC2
+VIC2CharsHiresPixelsX = 8
+VIC2CharsHiresPixelsY = 8
 ; Unexpanded sprite sizes
 !ifdef Global_SpriteExpandX {
 VIC2SpriteSizeX = 24*2
