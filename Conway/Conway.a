@@ -223,11 +223,11 @@ InstructionsText2
 	!scr "Move the cursor with the cursor keys"
 InstructionsText2End
 InstructionsText3
-	!scr "Space will toggle a pixel"
+	!scr "Space will toggle a cell"
 InstructionsText3End
 InstructionsText4
 	!scr "S will step a frame"
 InstructionsText4End
 InstructionsText5
-	!scr "C will step a frame"
+	!scr "C will clear the screen"
 InstructionsText5End
